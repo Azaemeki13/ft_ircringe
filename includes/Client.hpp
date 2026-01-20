@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/20 13:51:52 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/20 18:08:44 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 class Client 
 {
+    private:
     //-----CONSTRUCTOR
         Client(int fd, const std::string &host);
         Client();
@@ -28,6 +29,7 @@ class Client
     //-----NETWORK IDENTITY
         int socketFD; //used by poll(), should be set by server during client creation
         std::string getSocketFD()
+        std::string clientAddress;
         
         time_t getConnexionTime() const;
         time_t connexionTime;
