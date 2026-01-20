@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 16:44:51 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 17:11:22 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/20 17:15:19 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int main (int argc, char **argv)
 {
     if (argc != 3)
     {
-        std::cerr << "Usage: ./" << argv[0] << " <port> <password>." << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <port> <password>." << std::endl;
         return(1);
     }
     int port = std::atoi(argv[1]);

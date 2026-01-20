@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 15:23:44 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/20 17:20:08 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,30 @@
 
 // OCF 
 
-Server::Server()
+Server::Server() : port(66)
 {
+    initServ(66);
+    std::cout << "Default constructor called for Server." << std::endl;
+}
 
+Server::Server(int port)
+{
+    initServ(port);
+    std::cout << "Parameterised constructor called for Server." << std::endl;
+}
+
+Server::~Server()
+{
+    if (listener != -1)
+        close(listener);
+    if (epfd != -1)
+        close (epfd);
+    std::cout << "Called destructor on server." << std::endl;
 }
 
 void Server::initServ(int port)
 {
+    this->port = port;
     std::memset(&serv_addr, 0, sizeof(serv_addr));
     if ((listener = socket(AF_INET6, SOCK_STREAM, 0)) < 0)
         throw std::runtime_error("Failed to create socket: " + std::string(strerror(errno)));
@@ -41,7 +58,7 @@ void Server::initServ(int port)
         throw std::runtime_error("Bind failed: " + std::string(strerror(errno)));
     if (listen(listener, 10) < 0)
         throw std::runtime_error("Listened failed: " + std::string(strerror(errno)));
-    if (((epfd = epoll_create1(0))  == -1))
+    if ((epfd = epoll_create1(0))  == -1)
         throw std::runtime_error("epoll_create1 failed.");
     fd_ev.events = EPOLLIN;
     fd_ev.data.fd = listener;
@@ -93,4 +110,26 @@ void Server::handleNewConnection()
         close(new_fd);
     }
     std::cout << "New client connected: FD " << new_fd << std::endl;
+}
+
+void Server::handleClientMessage(int fd)
+{
+    char buffer[1024];
+    std::memset(buffer, 0, sizeof(buffer));
+    ssize_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytes_read <= 0)
+    {
+        std::cout << "Client " << fd << " disconnected." << std::endl;
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+        close(fd);
+    }
+    else
+    {
+        std::cout << "Client: " << fd << ": " << buffer << std::endl;
+    }
+}
+
+const char *Server::warnRunning::what() const throw()
+{
+    return("Warning on runtime: ");
 }

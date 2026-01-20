@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 15:20:08 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/20 17:11:55 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,15 +54,20 @@ class Server
         void handleClientMessage(int fd);
     
     public : 
-    // OCF 
+    // Allocs
         Server();
-        Server(char *port);
-        Server(const Server &other);
-        Server &operator = (const Server &other);
+        Server(int port);
         ~Server();
         
     // loop xdxd
         void run(); 
+
+    // exceptions
+        class warnRunning : public std::exception
+        {
+            public:
+                virtual const char *what() const throw();
+        };
 
 };
 
