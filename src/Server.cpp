@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 17:20:08 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/20 18:23:49 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,15 +101,20 @@ void Server::handleNewConnection()
         std::cerr << "Error accepting connection" << std::endl; // maybe unique exception here
         return;
     }
+    char client_ip[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip, INET6_ADDRSTRLEN);
+    std::cout << "Accepted connection from: " << client_ip << std::endl;
     fcntl(new_fd, F_SETFL, O_NONBLOCK);
+    Client new_client(new_fd, client_ip);
+    clients.insert(std::make_pair(new_fd, new_client));
     fd_ev.events = EPOLLIN;
     fd_ev.data.fd = new_fd;
     if (epoll_ctl(epfd, EPOLL_CTL_ADD, new_fd, &fd_ev) == -1)
     {
         std::cerr << "Failed to add client to epoll" << std::endl;
         close(new_fd);
+        clients.erase(new_fd);
     }
-    std::cout << "New client connected: FD " << new_fd << std::endl;
 }
 
 void Server::handleClientMessage(int fd)

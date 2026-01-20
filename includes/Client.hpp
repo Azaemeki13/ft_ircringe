@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2026/01/20 18:08:44 by chsauvag         ###   ########.fr       */
+=======
+/*   Updated: 2026/01/20 18:30:39 by cauffret         ###   ########.fr       */
+>>>>>>> fb9b16e (Charles 01-20 1832 added map to include Client, now need to fix Client shell)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +22,30 @@
 #define NEED_USER 0
 #define REGISTERED 0
 
+#include <sys/socket.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/epoll.h>
+#include <sys/stat.h>
+#include <csignal>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <cstring>
+#include <cstdlib>
+#include <cerrno>
+#include <stdexcept>
+#include <exception>
+#include <sstream>
+
 class Client 
 {
-    private:
+        public:
     //-----CONSTRUCTOR
         Client(int fd, const std::string &host);
         Client();
@@ -28,11 +53,11 @@ class Client
         
     //-----NETWORK IDENTITY
         int socketFD; //used by poll(), should be set by server during client creation
-        std::string getSocketFD()
-        std::string clientAddress;
+        std::string getSocketFD();
         
         time_t getConnexionTime() const;
         time_t connexionTime;
+        int authState;
 
     //-----IRC identity
         std::string nickName;
@@ -61,6 +86,6 @@ class Client
     
     //-----state
         /*void setAuthState();*/      
-}
+};
 
 #endif

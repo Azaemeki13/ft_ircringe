@@ -6,13 +6,14 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 17:11:55 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/20 18:25:10 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
     #define SERVER_HPP
 
+#include "Client.hpp"
 #include <sys/socket.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -43,7 +44,7 @@ class Server
         int listener; // doorman
         int port; // adress of the door
         struct sockaddr_in6 serv_addr;
-        std::vector<int> client_fd; // to store new connections
+        std::map<int, Client> clients; // to store new connections
         int epfd; // fd for my epoll
         struct epoll_event events[MAX_EVENTS]; // epoll array for all events
         struct epoll_event fd_ev; // other epoll array to add and modify fd's 
