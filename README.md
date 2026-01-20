@@ -31,11 +31,11 @@ Chapter 1: Initialization & Infrastructure
 
     Person B:
 
-        Create the Client class (to hold socket FD, nickname, username, authenticated status).
+      ✅  Create the Client class (to hold socket FD, nickname, username, authenticated status).
 
         Create the Channel class (to hold list of clients, operators, topic, modes).
 
-        Write a Parser function: it should take a raw string (e.g., PRIVMSG #chan :hello) and split it into a structured command object (prefix, command, arguments).
+      ✅  Write a Parser function: it should take a raw string (e.g., PRIVMSG #chan :hello) and split it into a structured command object (prefix, command, arguments).
 
 Chapter 2: Buffering & Authentication
 
