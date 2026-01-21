@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 13:41:34 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:00:15 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ class Channel
         //-----getters
         const std::string &getChannelName() const;
         const std::string &getTopic() const;
-        const std::vector<*Client> &getClients() const;
-        const std::vector<*Client> &getOperators() const;
+        const std::vector<Client*> &getClients() const;
+        const std::vector<Client*> &getOperators() const;
 
         bool isInviteOnly() const;
         bool isTopicProtected() const;
@@ -91,6 +91,6 @@ class Channel
         //-----setters (channel info)
         void setChannelName(std::string &name);
         void setTopic(std::string &topic);
-}
+};
 
 #endif

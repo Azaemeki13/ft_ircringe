@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 13:28:51 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:01:10 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class Server
     // data && variables
         int listener; // doorman
         int port; // adress of the door
+        std::string password; // server password
         struct sockaddr_in6 serv_addr;
         std::map<int, Client> clients; // to store new connections
         std::map<std::string, Channel> channels;
@@ -55,7 +56,7 @@ class Server
         void initServ(int port);
         void handleNewConnection();
         void handleClientMessage(int fd);
-        void 
+        
     public : 
     // Allocs
         Server();
@@ -64,6 +65,13 @@ class Server
         
     // loop xdxd
         void run(); 
+
+    // error handling
+        void sendError(Client &client, const std::string &code, const std::string &message);
+    
+    // getters
+        std::string getPassword() const;
+        void setPassword(const std::string &pwd);
 
     // exceptions
         class warnRunning : public std::exception

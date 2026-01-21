@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 16:44:51 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 17:11:22 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:59:28 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,18 @@ int main (int argc, char **argv)
         return(1);
     }
     int port = std::atoi(argv[1]);
+    std::string password = argv[2];
     try
     {
         Server serv(port);
+        serv.setPassword(password);
+        
+        // Test: Create a dummy client and send error
+        Client testClient(0, "127.0.0.1");
+        serv.sendError(testClient, "461", "Not enough parameters");
+        std::cout << "Test: Sent error message" << std::endl;
+        std::cout << "Test: Password set to: " << serv.getPassword() << std::endl;
+        
         serv.run();
     }
     catch (std::runtime_error &e)

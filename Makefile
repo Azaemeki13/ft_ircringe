@@ -14,7 +14,8 @@ OBJ_DIR     = obj
 # Source Files (Just the names, no path)
 SRC_FILES   = main.cpp \
               Server.cpp \
-			  Client.cpp
+			  Client.cpp \
+			  Channel.cpp
 
 # Add the path prefix to files (src/main.cpp)
 SRCS        = $(addprefix $(SRC_DIR)/, $(SRC_FILES))

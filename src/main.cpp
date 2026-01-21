@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 16:44:51 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 17:15:19 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:57:16 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,11 @@ int main (int argc, char **argv)
         return(1);
     }
     int port = std::atoi(argv[1]);
+    std::string password = argv[2];
     try
     {
         Server serv(port);
+        serv.setPassword(password);
         serv.run();
     }
     catch (std::runtime_error &e)

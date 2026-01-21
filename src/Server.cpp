@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 13:37:47 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:09:57 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void Server::handleClientMessage(int fd)
             substr = currentUser.buffer.substr(0, pos);
         if (!substr.empty())
         {
-            processClientMessage(substr);
+            // processClientMessage(substr);
             std::cout << "Debug: " << fd << "sent " << substr << std::endl;
         }
         currentUser.buffer.erase(0, pos + 1);
@@ -154,4 +154,25 @@ void Server::handleClientMessage(int fd)
 const char *Server::warnRunning::what() const throw()
 {
     return("Warning on runtime: ");
+}
+
+void Server::sendError(Client &client, const std::string &code, const std::string &message)
+{
+    std::string nickname;
+    if (client.nickName.empty())
+        nickname = "*";
+    else
+        nickname = client.nickName;
+    std::string errorMsg = ":server " + code + " " + nickname + " " + message + "\r\n";
+    send(client.socketFD, errorMsg.c_str(), errorMsg.length(), 0);
+}
+
+std::string Server::getPassword() const
+{
+    return password;
+}
+
+void Server::setPassword(const std::string &pwd)
+{
+    password = pwd;
 }

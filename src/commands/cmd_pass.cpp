@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 13:06:12 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 13:06:56 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:55:35 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,5 +19,12 @@
 
 void pass(Server &server, Client &client, const Commands &command)
 {
-    
+    if(command.params.size() < 1)
+        return server.sendError(client, "461", "PASS :Not enough parameters");
+    if(client.isAuthorized)
+        return server.sendError(client, "462", ":Unauthorized command (already registered)");
+    std::string password = command.params[0];
+    if(password != server.getPassword())
+        return server.sendError(client, "464", ":Password incorrect");
+    client.isAuthorized = true;
 }

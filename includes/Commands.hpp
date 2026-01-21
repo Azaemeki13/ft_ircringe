@@ -14,7 +14,7 @@
 #define COMMANDS_HPP
 
 #include "Client.hpp"
-#include "Sever.hpp"
+#include "Server.hpp"
 #include "Parser.hpp" //to get the cmd struct, TMTC
 
 //-----authentification flow

@@ -6,11 +6,18 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 13:17:16 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:02:18 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+
+Client::Client() : 
+    socketFD(-1), _connexionTime(time(NULL)), isAuthorized(false),
+    nickName(""),  userName(""), realName(""), hostName("")
+{
+    joinedChannels.clear();
+}
 
 Client::Client(int fd, const std::string &host) : 
     socketFD(fd), _connexionTime(time(NULL)), isAuthorized(false),
