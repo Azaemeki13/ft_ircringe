@@ -23,11 +23,11 @@ Chapter 1: Initialization & Infrastructure
 
     Person A:
 
-        Create the main Server class. Setup socket(), bind(), listen() based on the port argument.
+       ✅  Create the main Server class. Setup socket(), bind(), listen() based on the port argument.
 
-        Implement the main infinite loop using only one poll() (or epoll/kqueue).
+      ✅  Implement the main infinite loop using only one poll() (or epoll/kqueue).
 
-        Handle accept() to create new client file descriptors and add them to the poll set.
+       ✅  Handle accept() to create new client file descriptors and add them to the poll set.
 
     Person B:
 
@@ -41,9 +41,9 @@ Chapter 2: Buffering & Authentication
 
     Person A:
 
-        Crucial Step: Implement the buffering system. TCP streams can arrive in chunks (e.g., half a command). You must accumulate data in a buffer until you find a \n or \r\n before sending it to B's parser.
+        ✅  Crucial Step: Implement the buffering system. TCP streams can arrive in chunks (e.g., half a command). You must accumulate data in a buffer until you find a \n or \r\n before sending it to B's parser.
 
-        Handle client disconnection (cleaning up FDs and memory) without crashing.
+       ✅  Handle client disconnection (cleaning up FDs and memory) without crashing.
 
     Person B:
 
@@ -61,9 +61,9 @@ Chapter 3: Communications (The "Chat" Part)
 
     Person A:
 
-        Implement the send() logic. Ensure you don't block the server if a client's write buffer is full (advanced non-blocking I/O).
+       [CHARLES] Implement the send() logic. Ensure you don't block the server if a client's write buffer is full (advanced non-blocking I/O).
 
-        Integrate B's command responses into the main loop to actually send data back to the clients.
+       [CHRLES] Integrate B's command responses into the main loop to actually send data back to the clients.
 
     Person B:
 
@@ -71,9 +71,9 @@ Chapter 3: Communications (The "Chat" Part)
 
             Targeting a user: Find the target client and format the message.
 
-            Targeting a channel: Iterate through the Channel's client list and format the message for everyone except the sender.
+          [CHARLES]  Targeting a channel: Iterate through the Channel's client list and format the message for everyone except the sender.
 
-        Implement JOIN: Logic to create a channel if it doesn't exist, or add the user if it does.
+       [CHARLES] Implement JOIN: Logic to create a channel if it doesn't exist, or add the user if it does.
 
 Chapter 4: Administration & Modes
 
