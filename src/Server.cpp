@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 14:09:57 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 14:35:05 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ void Server::handleClientMessage(int fd)
         if (!substr.empty())
         {
             // processClientMessage(substr);
-            std::cout << "Debug: " << fd << "sent " << substr << std::endl;
+            std::cout << "Debug: " << fd << " sent " << substr << std::endl;
         }
         currentUser.buffer.erase(0, pos + 1);
     }
