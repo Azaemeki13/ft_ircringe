@@ -10,18 +10,31 @@ CXXFLAGS    = -Wall -Wextra -Werror -std=c++98 -I$(INC_DIR)
 SRC_DIR     = src
 INC_DIR     = includes
 OBJ_DIR     = obj
+CMD_DIR     = $(SRC_DIR)/commands
 
 # Source Files (Just the names, no path)
 SRC_FILES   = main.cpp \
               Server.cpp \
 			  Client.cpp \
-			  Channel.cpp
+			  Channel.cpp \
+			  Parser.cpp
 
-# Add the path prefix to files (src/main.cpp)
-SRCS        = $(addprefix $(SRC_DIR)/, $(SRC_FILES))
+# Command Files (in src/commands/)
+CMD_FILES   = cmd_pass.cpp \
+			  cmd_nick.cpp \
+			  cmd_user.cpp \
+			  cmd_auth.cpp \
+			  cmd_join.cpp \
+			  cmd_kick.cpp \
+			  cmd_mode.cpp \
+			  cmd_privmsg.cpp \
+			  cmd_topic.cpp
 
-# Object Files (obj/main.o)
-OBJS        = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))
+# Add the path prefix to files (src/main.cpp and src/commands/cmd_pass.cpp)
+SRCS        = $(addprefix $(SRC_DIR)/, $(SRC_FILES)) $(addprefix $(CMD_DIR)/, $(CMD_FILES))
+
+# Object Files (obj/main.o and obj/cmd_pass.o)
+OBJS        = $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o)) $(addprefix $(OBJ_DIR)/, $(CMD_FILES:.cpp=.o))
 
 # Colors
 GREEN       = \033[0;32m
@@ -40,6 +53,10 @@ $(NAME): $(OBJS)
 # Compile object files
 # mkdir -p $(OBJ_DIR) ensures the folder exists before compiling
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	@mkdir -p $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(CMD_DIR)/%.cpp
 	@mkdir -p $(OBJ_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

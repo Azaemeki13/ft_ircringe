@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 13:05:42 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 15:45:18 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,14 @@
 #define COMMANDS_HPP
 
 #include "Client.hpp"
-#include "Server.hpp"
 #include "Parser.hpp" //to get the cmd struct, TMTC
+
+// Forward declaration
+class Server;
 
 //-----authentification flow
 void pass(Server &server, Client &client, const Commands &command);
 void nick(Server &server, Client &client, const Commands &command);
-void user(Server &server, Client &client, const Commands &command);
+//void user(Server &server, Client &client, const Commands &command);
+
+#endif

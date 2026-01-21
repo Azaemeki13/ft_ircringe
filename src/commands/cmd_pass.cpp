@@ -6,11 +6,12 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 13:06:12 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 13:55:35 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 15:29:38 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Commands.hpp"
+#include "Server.hpp"
 
 /* The PASS command is used to set a 'connection password'.  The
    optional password can and MUST be set before any attempt to register

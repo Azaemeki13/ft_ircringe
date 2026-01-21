@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 14:01:10 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 15:59:59 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Parser.hpp"
+#include "Commands.hpp"
 #include <sys/socket.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -56,6 +58,7 @@ class Server
         void initServ(int port);
         void handleNewConnection();
         void handleClientMessage(int fd);
+        void processCommand(Client &client, const std::string &message);
         
     public : 
     // Allocs
@@ -72,6 +75,7 @@ class Server
     // getters
         std::string getPassword() const;
         void setPassword(const std::string &pwd);
+        const std::map<int, Client>& getClients() const;
 
     // exceptions
         class warnRunning : public std::exception
