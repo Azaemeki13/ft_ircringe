@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 10:52:09 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:17:16 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
 Client::Client(int fd, const std::string &host) : 
-    socketFD(fd), _connexionTime(time(NULL)),  authState(NEED_PASS), 
+    socketFD(fd), _connexionTime(time(NULL)), isAuthorized(false),
     nickName(""),  userName(""), realName(""), hostName(host)
 {
     joinedChannels.clear(); //starts empty
