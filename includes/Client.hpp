@@ -6,11 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2026/01/20 18:08:44 by chsauvag         ###   ########.fr       */
-=======
-/*   Updated: 2026/01/20 18:30:39 by cauffret         ###   ########.fr       */
->>>>>>> fb9b16e (Charles 01-20 1832 added map to include Client, now need to fix Client shell)
+/*   Updated: 2026/01/21 10:02:51 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +52,7 @@ class Client
         std::string getSocketFD();
         
         time_t getConnexionTime() const;
-        time_t connexionTime;
+        time_t _connexionTime;
         int authState;
 
     //-----IRC identity

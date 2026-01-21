@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/20 18:23:49 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 10:09:09 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ void Server::handleClientMessage(int fd)
         std::cout << "Client " << fd << " disconnected." << std::endl;
         epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
         close(fd);
+        clients.erase(fd);
     }
     else
     {
