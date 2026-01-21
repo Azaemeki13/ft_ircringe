@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 11:23:09 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:37:47 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,14 @@
 
 Server::Server() : port(66)
 {
+    channels.insert(std::make_pair("general", Channel("general")));
     initServ(66);
     std::cout << "Default constructor called for Server." << std::endl;
 }
 
 Server::Server(int port)
 {
+    channels.insert(std::make_pair("general", Channel("general")));
     initServ(port);
     std::cout << "Parameterised constructor called for Server." << std::endl;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 12:49:01 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:41:34 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ class Channel
         std::string topic;
         
         //-----client vector
-        std::vector<*Clients> clients;
-        std::vector<*Clients> operators;
+        std::vector<int> clients;
+        std::vector<int> operators;
         
         //-----modes
         bool inviteOnly; //-i
