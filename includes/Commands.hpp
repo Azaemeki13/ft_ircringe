@@ -1,0 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Commands.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
+/*   Updated: 2026/01/21 13:05:42 by chsauvag         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef COMMANDS_HPP
+#define COMMANDS_HPP
+
+#include "Client.hpp"
+#include "Sever.hpp"
+#include "Parser.hpp" //to get the cmd struct, TMTC
+
+//-----authentification flow
+void pass(Server &server, Client &client, const Commands &command);
+void nick(Server &server, Client &client, const Commands &command);
+void user(Server &server, Client &client, const Commands &command);

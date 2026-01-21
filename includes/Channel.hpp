@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 11:21:56 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/21 12:49:01 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ class Channel
         void isOperator(Client* client) const;
 
         //-----broadcast messaging
-        void broadcastMessage(Client* fromWho, const std::string &msg)
+        void broadcastMessage(Client* fromWho, const std::string &msg);
         
         //-----setters (mode options)
         void setInviteOnly(bool state);

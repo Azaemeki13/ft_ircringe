@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 10:50:39 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 13:15:36 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class Client
         time_t getConnexionTime() const;
         time_t _connexionTime;
         int authState;
+        bool isAuthorized;
 
     //-----IRC identity
         std::string nickName;
