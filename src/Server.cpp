@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 10:09:09 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 11:19:26 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,17 +121,31 @@ void Server::handleClientMessage(int fd)
 {
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
-    ssize_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    ssize_t bytes_read = recv(fd, buffer, sizeof(buffer), 0);
     if (bytes_read <= 0)
     {
         std::cout << "Client " << fd << " disconnected." << std::endl;
         epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
         close(fd);
         clients.erase(fd);
+        return;
     }
-    else
+    Client &currentUser = clients[fd];
+    currentUser.buffer.append(buffer, bytes_read);
+    size_t pos = 0;
+    while ((pos = currentUser.buffer.find('\n')) != std::string::npos)
     {
-        std::cout << "Client: " << fd << ": " << buffer << std::endl;
+        std::string substr;
+        if (pos > 0 && currentUser.buffer[pos - 1] == '\r')
+            substr = currentUser.buffer.substr(0, pos - 1);
+        else
+            substr = currentUser.buffer.substr(0, pos);
+        if (!substr.empty())
+        {
+            processClientMessage(substr);
+            std::cout << "Debug: " << fd << "sent " << substr << std::endl;
+        }
+        currentUser.buffer.erase(0, pos + 1);
     }
 }
 

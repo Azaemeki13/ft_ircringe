@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 10:02:51 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/21 10:50:39 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,11 @@ class Client
         void isInChannel(const std::string &channelName);
     
     //-----state
-        /*void setAuthState();*/      
+        /*void setAuthState();*/
+
+    //-----buffer 
+        std::string buffer;
+
 };
 
 #endif
