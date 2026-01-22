@@ -18,9 +18,9 @@
 #define NEED_USER 0
 #define REGISTERED 0
 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -38,6 +38,7 @@
 #include <stdexcept>
 #include <exception>
 #include <sstream>
+#include <ctime>
 
 class Client 
 {

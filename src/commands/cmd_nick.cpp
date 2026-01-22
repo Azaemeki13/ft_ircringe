@@ -16,7 +16,7 @@
 
 /*NICK command is used to give user a nickname or change the existing one.*/
 
-void nick(Server &server, Client &client, const Commands &command)
+/*void nick(Server &server, Client &client, const Commands &command)
 {
     if(command.params.size() < 1)
         return server.sendError(client, "461", "PASS :Not enough parameters");
@@ -31,4 +31,4 @@ void nick(Server &server, Client &client, const Commands &command)
     client.setNickName(newNick);
     std::string response = ":" + oldNick + " NICK :" + newNick + "\r\n";
     send(client.socketFD, response.c_str(), response.length(), 0);
-}
+}*/

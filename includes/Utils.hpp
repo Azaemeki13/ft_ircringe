@@ -17,7 +17,7 @@
 
 class Server;
 
-bool isValidNick(const std::string &nick);
-bool isNickInUse(Server &server, const std::string &nick);
+//bool isValidNick(const std::string &nick);
+//bool isNickInUse(Server &server, const std::string &nick);
 
 #endif

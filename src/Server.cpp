@@ -6,11 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-<<<<<<< Updated upstream
-/*   Updated: 2026/01/21 14:35:05 by cauffret         ###   ########.fr       */
-=======
 /*   Updated: 2026/01/21 15:26:03 by chsauvag         ###   ########.fr       */
->>>>>>> Stashed changes
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,13 +144,8 @@ void Server::handleClientMessage(int fd)
             substr = currentUser.buffer.substr(0, pos);
         if (!substr.empty())
         {
-<<<<<<< Updated upstream
-            // processClientMessage(substr);
-            std::cout << "Debug: " << fd << " sent " << substr << std::endl;
-=======
             std::cout << "Debug: " << fd << " sent " << substr << std::endl;
             processCommand(currentUser, substr);
->>>>>>> Stashed changes
         }
         currentUser.buffer.erase(0, pos + 1);
     }
@@ -184,6 +175,11 @@ std::string Server::getPassword() const
 void Server::setPassword(const std::string &pwd)
 {
     password = pwd;
+}
+
+const std::map<int, Client>& Server::getClients() const
+{
+    return clients;
 }
 
 void Server::processCommand(Client &client, const std::string &message)
