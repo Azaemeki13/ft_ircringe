@@ -193,9 +193,9 @@ void Server::processCommand(Client &client, const std::string &message)
     
     if (cmd.command == "PASS")
         pass(*this, client, cmd);
-    /*else if (cmd.command == "NICK")
+    else if (cmd.command == "NICK")
         nick(*this, client, cmd);
-    else if (cmd.command == "USER")
+    /*else if (cmd.command == "USER")
         user(*this, client, cmd);*/
     else
     {

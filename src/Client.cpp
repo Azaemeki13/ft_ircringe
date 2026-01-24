@@ -31,5 +31,42 @@ Client::~Client()
     std::cout << "Destructor called on client." << std::endl;
 }
 
+std::string Client::getNickName() const
+{
+    return nickName;
+}
 
+std::string Client::getUserName() const
+{
+    return userName;
+}
 
+std::string Client::getRealName() const
+{
+    return realName;
+}
+
+std::string Client::getHostName() const
+{
+    return hostName;
+}
+
+void Client::setNickName(const std::string &nick)
+{
+    nickName = nick;
+}
+
+void Client::setUserName(const std::string &user)
+{
+    userName = user;
+}
+
+void Client::setRealName(const std::string &real)
+{
+    realName = real;
+}
+
+void Client::setHostName(const std::string &host)
+{
+    hostName = host;
+}

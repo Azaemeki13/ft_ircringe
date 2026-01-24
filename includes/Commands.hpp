@@ -16,8 +16,10 @@
 #include "Client.hpp"
 #include "Parser.hpp" //to get the cmd struct, TMTC
 
-// Forward declaration
 class Server;
+
+//bool isValidNick(const std::string &nick);
+//bool isNickInUse(Server &server, const std::string &nick);
 
 //-----authentification flow
 void pass(Server &server, Client &client, const Commands &command);
