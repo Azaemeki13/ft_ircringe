@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 14:08:00 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/20 17:02:25 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/26 14:05:58 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,16 @@
 #include <vector>
 #include <sstream>
 
-struct Commands
+class Commands
 {
-    std::string prefix;
-    std::string command;
-    std::vector<std::string> params;
+        private:
+
+        public:
+            Commands(const std::string &message, int fd);
+            std::string prefix;
+            std::string command;
+            std::vector<std::string> params;
+            int client_fd;
 };
 
 Commands parseCommands(const std::string &line);

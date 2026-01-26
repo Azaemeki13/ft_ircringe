@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 14:02:18 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/26 14:16:34 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,34 @@ Client::~Client()
     std::cout << "Destructor called on client." << std::endl;
 }
 
-std::string Client::getNickName() const
+int Client::getSocketFD() const
+{
+    return(socketFD);
+}
+
+std::string& Client::getNickName() const
 {
     return nickName;
 }
 
-std::string Client::getUserName() const
+std::string& Client::getUserName() const
 {
     return userName;
 }
 
-std::string Client::getRealName() const
+std::string& Client::getRealName() const
 {
     return realName;
 }
 
-std::string Client::getHostName() const
+std::string& Client::getHostName() const
 {
     return hostName;
+}
+
+std::string& Client::getBuffer()
+{
+    return buffer;
 }
 
 void Client::setNickName(const std::string &nick)
@@ -69,4 +79,9 @@ void Client::setRealName(const std::string &real)
 void Client::setHostName(const std::string &host)
 {
     hostName = host;
+}
+
+void Client::setBuffer(const std::string &bufer)
+{
+    buffer = bufer;
 }

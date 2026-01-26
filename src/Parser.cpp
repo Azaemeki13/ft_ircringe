@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 14:08:04 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/20 17:55:52 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/26 14:00:58 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,20 @@ std::string trim(const std::string &line)
         return("");
     return(line.substr(start, end - start + 1));
 }
-
-Commands parseCommands(const std::string &line)
+Commands::Commands(const std::string &message, int fd) socketFD(fd)
 {
-    Commands cmd;
-    std::string trimmedLine = trim(line);
-    std::stringstream ss(trimmedLine);
+    std::string trimmedMessage = trim(message);
+    std::stringstream ss(trimmedMessage);
     std::string token;
-    
     if(ss >> token && token[0] == ':') //prefix
-        cmd.prefix = token.substr(1);
+        prefix = token.substr(1);
     else if(!token.empty())
     {
-        cmd.command = token;
+        command = token;
         token.clear();
     }
-    if(cmd.command.empty() && ss >> token) //command
-        cmd.command = token;
+    if(command.empty() && ss >> token) //command
+        command = token;
     while(ss >> token) //params
     {
         if(token[0] == ':')
@@ -47,11 +44,10 @@ Commands parseCommands(const std::string &line)
             std::string rest;
             if(getline(ss, rest))
                 trailing += rest;
-            cmd.params.push_back(trim(trailing));
+            params.push_back(trim(trailing));
             break ;
         }
         else
-            cmd.params.push_back(token);
+            params.push_back(token);
     }   
-    return(cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 15:26:03 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/26 14:33:03 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,38 +133,43 @@ void Server::handleClientMessage(int fd)
         return;
     }
     Client &currentUser = clients[fd];
-    currentUser.buffer.append(buffer, bytes_read);
+    currentUser.getBuffer().append(buffer, bytes_read);
     size_t pos = 0;
-    while ((pos = currentUser.buffer.find('\n')) != std::string::npos)
+    while ((pos = currentUser.getBuffer().find('\n')) != std::string::npos)
     {
         std::string substr;
-        if (pos > 0 && currentUser.buffer[pos - 1] == '\r')
-            substr = currentUser.buffer.substr(0, pos - 1);
+        if (pos > 0 && currentUser.getBuffer()[pos - 1] == '\r')
+            substr = currentUser.getBuffer().substr(0, pos - 1);
         else
-            substr = currentUser.buffer.substr(0, pos);
+            substr = currentUser.getBuffer().substr(0, pos);
         if (!substr.empty())
         {
             std::cout << "Debug: " << fd << " sent " << substr << std::endl;
             processCommand(currentUser, substr);
         }
-        currentUser.buffer.erase(0, pos + 1);
+        currentUser.getBuffer().erase(0, pos + 1);
     }
 }
 
+Server::warnRunning::warnRunning(int fd, int code) : client_fd(fd), errorCode(code)
+{}
+
+
 const char *Server::warnRunning::what() const throw()
-{
-    return("Warning on runtime: ");
-}
+{}
+
+Server::warnRunning::~warnRunning() throw()
+{}
 
 void Server::sendError(Client &client, const std::string &code, const std::string &message)
 {
     std::string nickname;
-    if (client.nickName.empty())
+    if (client.getNickName().empty())
         nickname = "*";
     else
-        nickname = client.nickName;
+        nickname = client.getNickName();
     std::string errorMsg = ":server " + code + " " + nickname + " " + message + "\r\n";
-    send(client.socketFD, errorMsg.c_str(), errorMsg.length(), 0);
+    send(client.getSocketFD(), errorMsg.c_str(), errorMsg.length(), 0);
 }
 
 std::string Server::getPassword() const
@@ -184,8 +189,7 @@ const std::map<int, Client>& Server::getClients() const
 
 void Server::processCommand(Client &client, const std::string &message)
 {
-    Commands cmd = parseCommands(message);
-    
+    Commands cmd(message, client.getSocketFD());
     if (cmd.command.empty())
         return;
     
@@ -195,6 +199,8 @@ void Server::processCommand(Client &client, const std::string &message)
         pass(*this, client, cmd);
     else if (cmd.command == "NICK")
         nick(*this, client, cmd);
+    else if (cmd.command == "JOIN")
+        join(*this, client, cmd);
     /*else if (cmd.command == "USER")
         user(*this, client, cmd);*/
     else

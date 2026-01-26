@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/21 15:59:59 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/26 14:27:14 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,13 @@ class Server
     // exceptions
         class warnRunning : public std::exception
         {
+            private:
+                int client_fd;
+                int errorCode;
             public:
+                warnRunning(int fd, int code);
                 virtual const char *what() const throw();
+                virtual ~warnRunning() throw();
         };
 
 };
