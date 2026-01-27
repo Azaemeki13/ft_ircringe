@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/27 12:54:39 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 16:22:23 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,24 +204,60 @@ const std::map<int, Client>& Server::getClients() const
     return clients;
 }
 
-void Server::processCommand(Client &client, const std::string &message)
+void Server::processCommand(Client &client, const std::string &message) //maybe would be better to use a switch case :P
 {
     Commands cmd(message, client.getSocketFD());
     if (cmd.command.empty())
         return;
     
     std::cout << "Processing command: " << cmd.command << std::endl;
-    
-    if (cmd.command == "PASS")
-        pass(*this, client, cmd);
-    else if (cmd.command == "NICK")
-        nick(*this, client, cmd);
-    else if (cmd.command == "JOIN")
-        join(*this, client, cmd);
-    /*else if (cmd.command == "USER")
-        user(*this, client, cmd);*/
-    else
+    try
     {
-        std::cout << "Unknown command: " << cmd.command << std::endl;
+        if (cmd.command == "PASS")
+            pass(*this, client, cmd);
+        else if (!client.getIsAuthorized())
+            throw Server::warnRunning(client.getSocketFD(), 451);
+        else if (cmd.command == "NICK")
+            nick(*this, client, cmd);
+        else if (cmd.command == "USER")
+            user(*this, client, cmd);
+        else if (cmd.command == "JOIN")
+            join(*this, client, cmd);
+        else
+        {
+            std::cout << "Unknown command: " << cmd.command << std::endl; //debug
+        }
+    }
+    catch (Server::warnRunning &e)
+    {
+        std::string errorCode;
+        std::stringstream ss;
+        ss << e.geterrorCode();
+        errorCode = ss.str();
+        std::string errorMsg;
+        if (e.geterrorCode() == 431)
+            errorMsg = ":No nickname given";
+        else if (e.geterrorCode() == 432)
+        {
+            if (cmd.command == "NICK")
+                errorMsg = cmd.params[0] + " :Erroneous nickname";
+            else if (cmd.command == "USER")
+                errorMsg = cmd.params[0] + " :Erroneous username";
+            else
+                errorMsg = ":Invalid input";
+        }
+        else if (e.geterrorCode() == 433)
+            errorMsg = cmd.params[0] + " :Nickname is already in use";
+        else if (e.geterrorCode() == 451)
+            errorMsg = ":You have not registered";
+        else if (e.geterrorCode() == 461)
+            errorMsg = cmd.command + " :Not enough parameters";
+        else if (e.geterrorCode() == 462)
+            errorMsg = ":Unauthorized command (already registered)";
+        else if (e.geterrorCode() == 464)
+            errorMsg = ":Password incorrect";
+        else
+            errorMsg = ":Unknown error";
+        sendError(client, errorCode, errorMsg);
     }
 }

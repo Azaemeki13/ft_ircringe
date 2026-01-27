@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 13:07:32 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 15:27:56 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "Client.hpp"
 #include "Parser.hpp" //to get the cmd struct, TMTC
+#include "Server.hpp"
 
 class Server;
 

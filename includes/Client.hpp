@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 13:24:43 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 16:06:18 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class Client
         private:
             int socketFD;
             time_t _connexionTime;
-            bool isAuthorized;
+            bool isAuthorized; 
             int authState;
 
             std::string nickName;

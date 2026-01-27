@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_nick.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 14:32:45 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 13:27:13 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 15:41:24 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Commands.hpp"
-#include "Server.hpp"
-#include "Utils.hpp"
 
 /*Common Nickname Rules & Invalid Characters:
 Allowed Characters: Letters (A-Z, a-z), numbers (0-9), hyphens (-), and specific symbols often include []{}^|_`. ->ok
@@ -52,11 +50,13 @@ bool isValidNick(const std::string &nick)
 bool isNickInUse(Server &server, const std::string &nick)
 {
     std::map<int, Client> clients = server.getClients();
-    while(clients.size())
+    std::map<int, Client>::iterator it = clients.begin();
+    
+    while(it != clients.end())
     {
-        std::map<int, Client>::iterator it = clients.begin();
         if(it->second.getNickName() == nick)
             return(true);
+        ++it;
     }
     return(false);
 }
@@ -66,16 +66,21 @@ bool isNickInUse(Server &server, const std::string &nick)
 void nick(Server &server, Client &client, const Commands &command)
 {
     if(command.params.size() < 1)
-        return server.sendError(client, "461", "PASS :Not enough parameters");
+        throw Server::warnRunning(client.getSocketFD(), 461);
     std::string newNick = command.params[0];
     if(newNick.empty())
-        return server.sendError(client, "431", ":No nickname given");
+        throw Server::warnRunning(client.getSocketFD(), 431);
     if(!isValidNick(newNick))
-        return server.sendError(client, "432", newNick + " :Erroneous nickname");
-    //if(isNickInUse(server, newNick))
-        //return server.sendError(client, "433", newNick + " :Nickname is already in use");
+        throw Server::warnRunning(client.getSocketFD(), 432);
+    if(isNickInUse(server, newNick))
+        throw Server::warnRunning(client.getSocketFD(), 433);
     std::string oldNick = client.getNickName();
     client.setNickName(newNick);
-    std::string response = ":" + oldNick + " NICK :" + newNick + "\r\n";
+    std::string prefix;
+    if(oldNick.empty())
+        prefix = "*";
+    else
+        prefix = oldNick;
+    std::string response = ":" + prefix + " NICK :" + newNick + "\r\n";
     send(client.getSocketFD(), response.c_str(), response.length(), 0);
 }
