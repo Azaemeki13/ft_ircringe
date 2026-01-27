@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_nick.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 14:32:45 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 11:20:15 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:27:13 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,5 +77,5 @@ void nick(Server &server, Client &client, const Commands &command)
     std::string oldNick = client.getNickName();
     client.setNickName(newNick);
     std::string response = ":" + oldNick + " NICK :" + newNick + "\r\n";
-    send(client.socketFD, response.c_str(), response.length(), 0);
+    send(client.getSocketFD(), response.c_str(), response.length(), 0);
 }

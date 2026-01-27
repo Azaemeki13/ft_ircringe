@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/26 14:17:15 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:24:43 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ class Client
 {
         private:
             int socketFD;
-            int authState;
-            bool isAuthorized;
             time_t _connexionTime;
+            bool isAuthorized;
+            int authState;
 
             std::string nickName;
             std::string userName;
@@ -70,9 +70,10 @@ class Client
         void setRealName(const std::string &real);
         void setHostName(const std::string &host);
 
-    //-----getters
-        int getSocketFD();
-        time_t getConnexionTime();
+    //-----getters 
+        int getSocketFD() const;
+        time_t getConnexionTime() const;
+        bool &getIsAuthorized();
         std::string &getNickName();
         std::string &getUserName();
         std::string &getRealName();

@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/26 14:27:14 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:26:30 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Channel.hpp"
 #include "Parser.hpp"
 #include "Commands.hpp"
+#include <algorithm>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -83,8 +84,11 @@ class Server
             private:
                 int client_fd;
                 int errorCode;
+                std::string message;
             public:
                 warnRunning(int fd, int code);
+                int getFD() const ;
+                int geterrorCode() const;
                 virtual const char *what() const throw();
                 virtual ~warnRunning() throw();
         };

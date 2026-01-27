@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/26 14:16:34 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:23:35 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,14 @@
 
 Client::Client() : 
     socketFD(-1), _connexionTime(time(NULL)), isAuthorized(false),
-    nickName(""),  userName(""), realName(""), hostName("")
+    authState(0), nickName(""),  userName(""), realName(""), hostName("")
 {
     joinedChannels.clear();
 }
 
 Client::Client(int fd, const std::string &host) : 
     socketFD(fd), _connexionTime(time(NULL)), isAuthorized(false),
-    nickName(""),  userName(""), realName(""), hostName(host)
+    authState(0), nickName(""),  userName(""), realName(""), hostName(host)
 {
     joinedChannels.clear(); //starts empty
 }
@@ -36,22 +36,27 @@ int Client::getSocketFD() const
     return(socketFD);
 }
 
-std::string& Client::getNickName() const
+bool &Client::getIsAuthorized() 
+{
+    return(isAuthorized);
+}
+
+std::string& Client::getNickName() 
 {
     return nickName;
 }
 
-std::string& Client::getUserName() const
+std::string& Client::getUserName() 
 {
     return userName;
 }
 
-std::string& Client::getRealName() const
+std::string& Client::getRealName() 
 {
     return realName;
 }
 
-std::string& Client::getHostName() const
+std::string& Client::getHostName() 
 {
     return hostName;
 }
@@ -79,9 +84,4 @@ void Client::setRealName(const std::string &real)
 void Client::setHostName(const std::string &host)
 {
     hostName = host;
-}
-
-void Client::setBuffer(const std::string &bufer)
-{
-    buffer = bufer;
 }

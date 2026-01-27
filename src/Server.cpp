@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/26 14:33:03 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 12:54:39 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,11 +152,28 @@ void Server::handleClientMessage(int fd)
 }
 
 Server::warnRunning::warnRunning(int fd, int code) : client_fd(fd), errorCode(code)
-{}
+{
+    std::stringstream ss;
+    ss << "Error code " << errorCode << " on FD N-" << client_fd;
+    message = ss.str();
+}
 
+int Server::warnRunning::getFD() const
+{
+    return(client_fd);
+}
+
+
+int Server::warnRunning::geterrorCode() const
+{
+    return(errorCode);
+}
 
 const char *Server::warnRunning::what() const throw()
-{}
+{
+
+    return(message.c_str());
+}
 
 Server::warnRunning::~warnRunning() throw()
 {}

@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 14:08:04 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/26 14:00:58 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/27 13:20:23 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ std::string trim(const std::string &line)
         return("");
     return(line.substr(start, end - start + 1));
 }
-Commands::Commands(const std::string &message, int fd) socketFD(fd)
+Commands::Commands(const std::string &message, int fd) : client_fd(fd)
 {
     std::string trimmedMessage = trim(message);
     std::stringstream ss(trimmedMessage);
