@@ -49,13 +49,13 @@ Chapter 2: Buffering & Authentication
 
         Implement the Authentication flow:
 
-            PASS: Verify the password matches the server argument.
+          ✅  PASS: Verify the password matches the server argument.
 
-            NICK: Set user nickname (check for collisions).
+          ✅  NICK: Set user nickname (check for collisions).
 
-            USER: Register the username/realname.
+          ✅  USER: Register the username/realname.
 
-        Ensure a user cannot send other commands until registered.
+      ✅  Ensure a user cannot send other commands until registered.
 
 Chapter 3: Communications (The "Chat" Part)
 
