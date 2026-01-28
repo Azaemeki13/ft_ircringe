@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 14:18:50 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:25:58 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void Server::initServ(int port)
     int opt = 1;
     if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
-    int v6only = 0;
+    int v6only = 1;
     if (setsockopt(listener, IPPROTO_IPV6, IPV6_V6ONLY, &v6only, sizeof(v6only)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
     serv_addr.sin6_family = AF_INET6;
@@ -177,6 +177,33 @@ const char *Server::warnRunning::what() const throw()
 Server::warnRunning::~warnRunning() throw()
 {}
 
+
+erver::warnJoin::warnJoin(int fd, int code, std::string channel) : client_fd(fd), errorCode(code), channel_name(channel)
+{}
+
+int Server::warnJoin::getChannelName() const
+{
+    return(channel);
+}
+int Server::warnJoin::getFD() const
+{
+    return(client_fd);
+}
+
+int Server::warnJoin::getErrorCode() const
+{
+    return(errorCode);
+}
+
+const char *Server::warnJoin::what() const throw()
+{
+
+    return(channel_name.c_str());
+}
+
+Server::warnJoin::~warnJoin() throw()
+{}
+
 void Server::sendError(Client &client, const std::string &code, const std::string &message)
 {
     std::string nickname;
@@ -212,8 +239,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
 {
     switch(code)
     {
-        case 401:
-            return(":No such nick/channel");
+        /*case 401:
+            return(" :No such nick/channel")*/
         case 411:
             return(":No recipient given" + cmd.command);
         case 412:
@@ -257,6 +284,12 @@ void Server::handleError(const Server::warnRunning &e, Client &client, const Com
 }
 
 void Server::processCommand(Client &client, const std::string &message)
+std::map<std::string, std::string>& Server::getChannels()
+{
+    return(channels);
+}
+
+void Server::processCommand(Client &client, const std::string &message) //maybe would be better to use a switch case :P
 {
     Commands cmd(message, client.getSocketFD());
     if (cmd.command.empty())
@@ -283,5 +316,35 @@ void Server::processCommand(Client &client, const std::string &message)
     catch (Server::warnRunning &e)
     {
         handleError(e, client, cmd);
+        continue;
+    }
+    catch(Server::warnJoin &e)
+    {
+        switch (e.geterrorCode())
+        {   
+            case 461 :
+            {
+                sendError(client, e.geterrorCode(), "JOIN :Not enough parameters.");
+                return;
+            }
+            case 479 :
+            {
+                sendError(client, e.geterrorCode(), "JOIN : ERR_BADCHANNAME");
+                return;
+            }
+            case 475 :
+            {
+                std::stringstream ss;
+                ss << "JOIN: " << e.getChannelName() << " Password mismatch or no password put, please enter one.";
+                std::string error_msg = ss.str();
+                sendError(client, e.geterrorCode(), error_msg);
+                return;
+            }
+            case default :
+            {
+                sendError(client, 404, "Unknown error message.");
+            }
+        }
+
     }
 }

@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/21 15:01:07 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:20:36 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,13 +55,14 @@ class Channel
     public:
         //-----constructors
         Channel(const std::string &channelName);
+        Channel(const std::string &channelName, const std::string &password);
         Channel();
         ~Channel();
         
         //-----getters
         const std::string &getChannelName() const;
         const std::string &getTopic() const;
-        const std::vector<Client*> &getClients() const;
+        std::vector<int> &getClients();
         const std::vector<Client*> &getOperators() const;
 
         bool isInviteOnly() const;

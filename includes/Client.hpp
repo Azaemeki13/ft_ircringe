@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 13:43:49 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 13:56:14 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class Client
         Client();
         ~Client();
         
-    //DSL CHLO JE MY RETROUVE PAS 
     //-----setters
         void setNickName(const std::string &nick);
         void setUserName(const std::string &user);
@@ -79,10 +78,6 @@ class Client
         std::string &getRealName();
         std::string &getHostName();
         std::string &getBuffer();
-        const std::string &getNickName() const;
-        const std::string &getUserName() const;
-        const std::string &getRealName() const;
-        const std::string &getHostName() const;
 
     //-----Functions 
         void leaveChannel(const std::string &channelName);

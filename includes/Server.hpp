@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 13:42:55 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:25:54 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,20 @@ class Server
                 warnRunning(int fd, int code);
                 int getFD() const ;
                 int getErrorCode() const;
+                virtual const char *what() const throw();
+                virtual ~warnRunning() throw();
+        };
+        class warnJoin : public std::exception
+        {
+            private:
+                int client_fd;
+                int errorCode;
+                std::string channel;
+            public:
+                warnJoin(int fd, int code, std::string channel_name);
+                int getFD() const ;
+                int getErrorCode() const;
+                std::string getChannelName() const;
                 virtual const char *what() const throw();
                 virtual ~warnRunning() throw();
         };
