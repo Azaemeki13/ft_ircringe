@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 12:41:20 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 16:04:27 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 09:53:08 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,8 @@ bool isValidReal(const std::string &real)
     return(true);
 }
 
-void user(Server &server, Client &client, const Commands &command)
+void user(Client &client, const Commands &command)
 {
-    (void)server;
     if(command.params.size() != 4)
         throw Server::warnRunning(client.getSocketFD(), 461);
     std::string username = command.params[0];

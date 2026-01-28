@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/27 16:22:23 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 10:25:29 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int Server::warnRunning::getFD() const
 }
 
 
-int Server::warnRunning::geterrorCode() const
+int Server::warnRunning::getErrorCode() const
 {
     return(errorCode);
 }
@@ -204,12 +204,54 @@ const std::map<int, Client>& Server::getClients() const
     return clients;
 }
 
-void Server::processCommand(Client &client, const std::string &message) //maybe would be better to use a switch case :P
+std::string Server::getErrorMessage(int code, const Commands &cmd) const
+{
+    switch(code)
+    {
+        case 431: 
+            return(":No nickname given");
+        case 432:
+        {
+            if(!cmd.params.empty())
+            {
+                if(cmd.command == "NICK")
+                    return(cmd.params[0] + " :Erroneous nickname");
+                else if(cmd.command == "USER")
+                    return(cmd.params[0] + " :Erroneous username");
+            }
+            return(":Erroneous input");
+        }
+        case 433:
+            return(cmd.params[0] + " :Nickname is already in use");
+        case 451:
+            return(":You have not registered");
+        case 461:
+            return(cmd.command + " :Not enough parameters");
+        case 462:
+            return(":Unauthorized command (already registered)");
+        case 464:
+            return(":Password incorrect");
+        default:
+            return(":Unknown error"); //debug
+    }
+}
+
+void Server::handleError(const Server::warnRunning &e, Client &client, const Commands &cmd)
+{
+    std::stringstream ss;
+    ss << e.getErrorCode();
+    std::string errorCode = ss.str();
+
+    std::string errorMessage(getErrorMessage(e.getErrorCode(), cmd));
+    sendError(client, errorCode, errorMessage);
+}
+
+void Server::processCommand(Client &client, const std::string &message)
 {
     Commands cmd(message, client.getSocketFD());
     if (cmd.command.empty())
         return;
-    
+
     std::cout << "Processing command: " << cmd.command << std::endl;
     try
     {
@@ -220,44 +262,14 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
         else if (cmd.command == "NICK")
             nick(*this, client, cmd);
         else if (cmd.command == "USER")
-            user(*this, client, cmd);
+            user(client, cmd);
         else if (cmd.command == "JOIN")
             join(*this, client, cmd);
         else
-        {
-            std::cout << "Unknown command: " << cmd.command << std::endl; //debug
-        }
+            std::cout << "Unknown command: " << cmd.command << std::endl;
     }
     catch (Server::warnRunning &e)
     {
-        std::string errorCode;
-        std::stringstream ss;
-        ss << e.geterrorCode();
-        errorCode = ss.str();
-        std::string errorMsg;
-        if (e.geterrorCode() == 431)
-            errorMsg = ":No nickname given";
-        else if (e.geterrorCode() == 432)
-        {
-            if (cmd.command == "NICK")
-                errorMsg = cmd.params[0] + " :Erroneous nickname";
-            else if (cmd.command == "USER")
-                errorMsg = cmd.params[0] + " :Erroneous username";
-            else
-                errorMsg = ":Invalid input";
-        }
-        else if (e.geterrorCode() == 433)
-            errorMsg = cmd.params[0] + " :Nickname is already in use";
-        else if (e.geterrorCode() == 451)
-            errorMsg = ":You have not registered";
-        else if (e.geterrorCode() == 461)
-            errorMsg = cmd.command + " :Not enough parameters";
-        else if (e.geterrorCode() == 462)
-            errorMsg = ":Unauthorized command (already registered)";
-        else if (e.geterrorCode() == 464)
-            errorMsg = ":Password incorrect";
-        else
-            errorMsg = ":Unknown error";
-        sendError(client, errorCode, errorMsg);
+        handleError(e, client, cmd);
     }
 }

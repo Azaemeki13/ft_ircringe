@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/27 13:26:30 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/28 10:30:46 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ class Server
 
     // error handling
         void sendError(Client &client, const std::string &code, const std::string &message);
+        std::string getErrorMessage(int code, const Commands &cmd) const;
+
     
     // getters
         std::string getPassword() const;
@@ -88,11 +90,11 @@ class Server
             public:
                 warnRunning(int fd, int code);
                 int getFD() const ;
-                int geterrorCode() const;
+                int getErrorCode() const;
                 virtual const char *what() const throw();
                 virtual ~warnRunning() throw();
         };
-
+        void handleError(const warnRunning &e, Client &client, const Commands &cmd);
 };
 
 

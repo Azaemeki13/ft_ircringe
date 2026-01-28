@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 15:27:56 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 09:53:17 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ class Server;
 //-----authentification flow
 void pass(Server &server, Client &client, const Commands &command);
 void nick(Server &server, Client &client, const Commands &command);
-void user(Server &server, Client &client, const Commands &command);
+void user(Client &client, const Commands &command);
 void join(Server &server, Client &client, const Commands &command);
 
 #endif
