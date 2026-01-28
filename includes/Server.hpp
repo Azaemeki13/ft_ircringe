@@ -79,6 +79,7 @@ class Server
         std::string getPassword() const;
         void setPassword(const std::string &pwd);
         const std::map<int, Client>& getClients() const;
+        std::map<std::string, Channel>& getChannels();
 
     // exceptions
         class warnRunning : public std::exception

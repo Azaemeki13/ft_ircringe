@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 10:25:29 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 11:33:10 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ int Server::warnRunning::getFD() const
     return(client_fd);
 }
 
-
 int Server::warnRunning::getErrorCode() const
 {
     return(errorCode);
@@ -204,10 +203,21 @@ const std::map<int, Client>& Server::getClients() const
     return clients;
 }
 
+std::map<std::string, Channel>& Server::getChannels()
+{
+    return channels;
+}
+
 std::string Server::getErrorMessage(int code, const Commands &cmd) const
 {
     switch(code)
     {
+        /*case 401:
+            return(" :No such nick/channel")*/
+        case 411:
+            return(":No recipient given" + cmd.command);
+        case 412:
+            return(":No text to send");
         case 431: 
             return(":No nickname given");
         case 432:
@@ -265,6 +275,8 @@ void Server::processCommand(Client &client, const std::string &message)
             user(client, cmd);
         else if (cmd.command == "JOIN")
             join(*this, client, cmd);
+        else if (cmd.command == "PRIVMSG")
+            privmsg(*this, client, cmd);
         else
             std::cout << "Unknown command: " << cmd.command << std::endl;
     }
