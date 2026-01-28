@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 13:23:35 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/28 13:43:51 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,4 +84,24 @@ void Client::setRealName(const std::string &real)
 void Client::setHostName(const std::string &host)
 {
     hostName = host;
+}
+
+const std::string& Client::getNickName() const
+{
+    return nickName;
+}
+
+const std::string& Client::getUserName() const
+{
+    return userName;
+}
+
+const std::string& Client::getRealName() const
+{
+    return realName;
+}
+
+const std::string& Client::getHostName() const
+{
+    return hostName;
 }

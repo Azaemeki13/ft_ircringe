@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 11:33:10 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 13:41:21 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,8 +212,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
 {
     switch(code)
     {
-        /*case 401:
-            return(" :No such nick/channel")*/
+        case 401:
+            return(":No such nick/channel");
         case 411:
             return(":No recipient given" + cmd.command);
         case 412:
