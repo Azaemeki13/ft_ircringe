@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 14:25:54 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/28 15:26:57 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ class Server
                 int getErrorCode() const;
                 std::string getChannelName() const;
                 virtual const char *what() const throw();
-                virtual ~warnRunning() throw();
+                virtual ~warnJoin() throw();
         };
         void handleError(const warnRunning &e, Client &client, const Commands &cmd);
 };

@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 14:25:58 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/01/28 15:34:49 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,10 +178,10 @@ Server::warnRunning::~warnRunning() throw()
 {}
 
 
-erver::warnJoin::warnJoin(int fd, int code, std::string channel) : client_fd(fd), errorCode(code), channel_name(channel)
+Server::warnJoin::warnJoin(int fd, int code, std::string channel) : client_fd(fd), errorCode(code), channel(channel)
 {}
 
-int Server::warnJoin::getChannelName() const
+std::string Server::warnJoin::getChannelName() const
 {
     return(channel);
 }
@@ -198,7 +198,7 @@ int Server::warnJoin::getErrorCode() const
 const char *Server::warnJoin::what() const throw()
 {
 
-    return(channel_name.c_str());
+    return(channel.c_str());
 }
 
 Server::warnJoin::~warnJoin() throw()
@@ -283,12 +283,6 @@ void Server::handleError(const Server::warnRunning &e, Client &client, const Com
     sendError(client, errorCode, errorMessage);
 }
 
-void Server::processCommand(Client &client, const std::string &message)
-std::map<std::string, std::string>& Server::getChannels()
-{
-    return(channels);
-}
-
 void Server::processCommand(Client &client, const std::string &message) //maybe would be better to use a switch case :P
 {
     Commands cmd(message, client.getSocketFD());
@@ -316,20 +310,20 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     catch (Server::warnRunning &e)
     {
         handleError(e, client, cmd);
-        continue;
+        return;
     }
     catch(Server::warnJoin &e)
     {
-        switch (e.geterrorCode())
+        switch (e.getErrorCode())
         {   
             case 461 :
             {
-                sendError(client, e.geterrorCode(), "JOIN :Not enough parameters.");
+                sendError(client, e.getErrorCode(), "JOIN :Not enough parameters.");
                 return;
             }
             case 479 :
             {
-                sendError(client, e.geterrorCode(), "JOIN : ERR_BADCHANNAME");
+                sendError(client, e.getErrorCode(), "JOIN : ERR_BADCHANNAME");
                 return;
             }
             case 475 :
@@ -337,7 +331,7 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
                 std::stringstream ss;
                 ss << "JOIN: " << e.getChannelName() << " Password mismatch or no password put, please enter one.";
                 std::string error_msg = ss.str();
-                sendError(client, e.geterrorCode(), error_msg);
+                sendError(client, e.getErrorCode(), error_msg);
                 return;
             }
             case default :
