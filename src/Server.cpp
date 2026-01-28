@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 13:41:21 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/01/28 14:05:26 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void Server::initServ(int port)
     int opt = 1;
     if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
-    int v6only = 1;
+    int v6only = 0;
     if (setsockopt(listener, IPPROTO_IPV6, IPV6_V6ONLY, &v6only, sizeof(v6only)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
     serv_addr.sin6_family = AF_INET6;
