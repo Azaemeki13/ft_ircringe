@@ -12,7 +12,7 @@
 
 #include "Channel.hpp"
 
-Channel::Channel() : chanelName(""), topic(""), inviteOnly(0),
+Channel::Channel() : channelName(""), topic(""), inviteOnly(0),
         topicProtected(0), key(""), userLimit(0)
 {
     clients.clear();
@@ -41,4 +41,8 @@ Channel::~Channel()
 std::vector<int> &Channel::getClients()
 {
     return(clients);
+}
+const std::string Channel::getKey() const
+{
+    return key;
 }

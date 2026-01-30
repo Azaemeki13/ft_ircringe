@@ -47,7 +47,7 @@ void Server::initServ(int port)
     int opt = 1;
     if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
-    int v6only = 1;
+    int v6only = 0;
     if (setsockopt(listener, IPPROTO_IPV6, IPV6_V6ONLY, &v6only, sizeof(v6only)) != 0)
         throw std::runtime_error("Failed to set socket option: " + std::string(strerror(errno)));
     serv_addr.sin6_family = AF_INET6;
@@ -294,7 +294,7 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     {
         if (cmd.command == "PASS")
             pass(*this, client, cmd);
-        else if (!client.getIsAuthorized())
+        if (!client.getIsAuthorized())
             throw Server::warnRunning(client.getSocketFD(), 451);
         else if (cmd.command == "NICK")
             nick(*this, client, cmd);
@@ -304,6 +304,12 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
             join(*this, client, cmd);
         else if (cmd.command == "PRIVMSG")
             privmsg(*this, client, cmd);
+        else if (cmd.command == "QUIT")
+        {
+            // Client is disconnecting - just acknowledge
+            std::cout << "Client requested QUIT" << std::endl;
+            return;
+        }
         else
             std::cout << "Unknown command: " << cmd.command << std::endl;
     }
@@ -314,16 +320,20 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     }
     catch(Server::warnJoin &e)
     {
+        std::stringstream codeStream;
+        codeStream << e.getErrorCode();
+        std::string errorCode = codeStream.str();
+        
         switch (e.getErrorCode())
         {   
             case 461 :
             {
-                sendError(client, e.getErrorCode(), "JOIN :Not enough parameters.");
+                sendError(client, errorCode, "JOIN :Not enough parameters.");
                 return;
             }
             case 479 :
             {
-                sendError(client, e.getErrorCode(), "JOIN : ERR_BADCHANNAME");
+                sendError(client, errorCode, "JOIN : ERR_BADCHANNAME");
                 return;
             }
             case 475 :
@@ -331,12 +341,12 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
                 std::stringstream ss;
                 ss << "JOIN: " << e.getChannelName() << " Password mismatch or no password put, please enter one.";
                 std::string error_msg = ss.str();
-                sendError(client, e.getErrorCode(), error_msg);
+                sendError(client, errorCode, error_msg);
                 return;
             }
-            case default :
+            default :
             {
-                sendError(client, 404, "Unknown error message.");
+                sendError(client, "404", "Unknown error message.");
             }
         }
 

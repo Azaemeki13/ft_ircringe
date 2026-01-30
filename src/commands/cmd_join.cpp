@@ -37,9 +37,10 @@ std::map<std::string, std::string> parseJoin(const Commands &command, int client
         throw Server::warnJoin(461, client_fd, "");
         //return server.sendError(client, "461", "JOIN :Not enough parameters");
     std::vector<std::string> channels_n = split(command.params[0], ',');
+    std::vector<std::string> channels_p;
     if (command.params.size() == 2 )
     {
-        std::vector<std::string> channels_p = split(command.params[1], ',');
+        channels_p = split(command.params[1], ',');
     }
     for (size_t i = 0; i < channels_n.size(); ++i)
     {
@@ -59,14 +60,14 @@ std::map<std::string, std::string> parseJoin(const Commands &command, int client
 
 void join(Server &server, Client &client, const Commands &command)
 {
-    std::map<std::string, std::string> server_list = parseJoin(command);
+    std::map<std::string, std::string> server_list = parseJoin(command, client.getSocketFD());
     std::map<std::string, std::string>::iterator pr_it = server_list.begin();
-    std::map<std::string, Server::Channel>::iterator servit;
+    std::map<std::string, Channel>::iterator servit;
     for (; pr_it != server_list.end(); ++pr_it)
     {
         servit = server.getChannels().find(pr_it->first);
         // case 1 finds the channel
-        if (servit != server.getChannels.end()) // conditions en mode invite only etc a rajouter ici
+        if (servit != server.getChannels().end()) // conditions en mode invite only etc a rajouter ici
         {
             if (servit->second.getKey() == pr_it->second) // pw matching
             {

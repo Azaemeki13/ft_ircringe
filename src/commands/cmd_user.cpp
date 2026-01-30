@@ -69,10 +69,15 @@ void user(Client &client, const Commands &command)
         client.setRealName("Anonymous");
     else
         client.setRealName(realname);
-    
     std::string nickname = client.getNickName();
     if(nickname.empty())
         nickname = "*";
-    std::string response = ":server 001 " + nickname + " :It works bitch\r\n";
-    send(client.getSocketFD(), response.c_str(), response.length(), 0);
+    std::string welcome = ":server 001 " + nickname + " :Welcome to the IRC Network " + nickname + "!~" + username + "@localhost\r\n";
+    send(client.getSocketFD(), welcome.c_str(), welcome.length(), 0);
+    std::string yourhost = ":server 002 " + nickname + " :Your host is server, running version 1.0\r\n";
+    send(client.getSocketFD(), yourhost.c_str(), yourhost.length(), 0);
+    std::string created = ":server 003 " + nickname + " :This server was created today\r\n";
+    send(client.getSocketFD(), created.c_str(), created.length(), 0);
+    std::string myinfo = ":server 004 " + nickname + " server 1.0 o o\r\n";
+    send(client.getSocketFD(), myinfo.c_str(), myinfo.length(), 0);
 }

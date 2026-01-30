@@ -105,3 +105,4 @@ const std::string& Client::getHostName() const
 {
     return hostName;
 }
+

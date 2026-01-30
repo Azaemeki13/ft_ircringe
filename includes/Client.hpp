@@ -78,6 +78,11 @@ class Client
         std::string &getRealName();
         std::string &getHostName();
         std::string &getBuffer();
+        
+        const std::string &getNickName() const;
+        const std::string &getUserName() const;
+        const std::string &getRealName() const;
+        const std::string &getHostName() const;
 
     //-----Functions 
         void leaveChannel(const std::string &channelName);
