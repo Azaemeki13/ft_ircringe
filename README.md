@@ -69,7 +69,7 @@ Chapter 3: Communications (The "Chat" Part)
 
         Implement PRIVMSG:
 
-            Targeting a user: Find the target client and format the message.
+           ✅ Targeting a user: Find the target client and format the message.
 
           [CHARLES]  Targeting a channel: Iterate through the Channel's client list and format the message for everyone except the sender.
 
