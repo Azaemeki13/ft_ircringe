@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 09:33:36 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 14:20:02 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/02 10:27:12 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void join(Server &server, Client &client, const Commands &command)
             {
                 servit->second.getClients().push_back(client.getSocketFD());
                 std::stringstream ss;
-                ss << "Succesfully joined the channel " << pr_it->first;
+                ss << "Succesfully joined the channel " << pr_it->first << "\n";
                 std::string successMessage = ss.str();
                 send(client.getSocketFD(), successMessage.c_str(), successMessage.length(), 0);
             }
@@ -89,7 +89,7 @@ void join(Server &server, Client &client, const Commands &command)
             servit = server.getChannels().find(pr_it->first);
             servit->second.getClients().push_back(client.getSocketFD());
             std::stringstream ss;
-            ss << "Succesfully created the channel " << pr_it->first;
+            ss << "Succesfully created the channel " << pr_it->first << "\n";
             std::string successMessage = ss.str();
             send(client.getSocketFD(), successMessage.c_str(), successMessage.length(), 0);
         }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_privmsg.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:42:59 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 13:41:01 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/02 10:17:12 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,27 @@ void sendToUser(Server &server, Client &client, const std::string &receiver, con
 {
     Client *recipient = server.getClientByNickname(receiver);
     if(!recipient)
-    {
         throw Server::warnRunning(client.getSocketFD(), 401);
-        return ;
-    }
     std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + receiver + " :" + messageToSend + "\r\n";
-    ::send(recipient->getSocketFD(), messageReady.c_str(), messageReady.length(), 0);
-}   
+    send(recipient->getSocketFD(), messageReady.c_str(), messageReady.length(), 0);
+}
+
+void sendToChannel(Server &server, Client &client, const std::string channel, const std::string &messageToSend)
+{
+    std::map<std::string, Channel>::iterator channel_it = server.getChannels().find(channel);
+    if (channel_it == server.getChannels().end())
+        throw Server::warnJoin(client.getSocketFD(), 403, channel);
+    std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + channel_it->first + " :" + messageToSend + "\r\n"; 
+    std::vector<int> &chan_clients = channel_it->second.getClients();
+    std::vector<int>::iterator browse;
+    for(browse = chan_clients.begin(); browse != chan_clients.end(); ++browse)
+    {
+        if (*browse != client.getSocketFD())
+        {
+            send(*browse, messageReady.c_str(), messageReady.length(), 0);
+        }
+    }
+}
 
 void privmsg(Server &server, Client &client, const Commands &command)
 {
@@ -81,6 +95,11 @@ void privmsg(Server &server, Client &client, const Commands &command)
     std::string receiver = command.params[0];
     std::string messageToSend = command.params[1];
     std::string nickFirstChar = "[]{}^|_`-";
+    std::string isServer = "#&";
     if(!receiver.empty() && (std::isalpha(receiver[0]) || nickFirstChar.find(receiver[0]) != std::string::npos))
         sendToUser(server, client, receiver, messageToSend);
+    else if (!receiver.empty() && (isServer.find(receiver[0]) != std::string::npos))
+        sendToChannel(server, client, receiver, messageToSend);
+    else
+        throw Server::warnJoin(client.getSocketFD(), 401, receiver);
 }
