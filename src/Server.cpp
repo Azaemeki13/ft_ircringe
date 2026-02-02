@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 15:34:49 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/02 15:26:54 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
             return(" :No such nick/channel")*/
         case 411:
             return(":No recipient given" + cmd.command);
+        case 421:
+            return(cmd.command + " :Unknown command");
         case 412:
             return(":No text to send");
         case 431: 
@@ -292,11 +294,17 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     std::cout << "Processing command: " << cmd.command << std::endl;
     try
     {
+        if (cmd.command == "CAP")
+            return;
         if (cmd.command == "PASS")
+        {
             pass(*this, client, cmd);
+            return;
+        }
         if (!client.getIsAuthorized())
             throw Server::warnRunning(client.getSocketFD(), 451);
-        else if (cmd.command == "NICK")
+        
+        if (cmd.command == "NICK")
             nick(*this, client, cmd);
         else if (cmd.command == "USER")
             user(client, cmd);
@@ -304,14 +312,28 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
             join(*this, client, cmd);
         else if (cmd.command == "PRIVMSG")
             privmsg(*this, client, cmd);
+        else if (cmd.command == "PING")
+        {
+            std::string pong;
+            if (cmd.params.size() > 0)
+                pong = "PONG server :" + cmd.params[0] + "\r\n";
+            else
+                pong = "PONG server\r\n";
+            send(client.getSocketFD(), pong.c_str(), pong.length(), 0);
+            return;
+        }
+        else if(cmd.command == "TOPIC")
+            topic(*this, client, cmd);
         else if (cmd.command == "QUIT")
         {
-            // Client is disconnecting - just acknowledge
             std::cout << "Client requested QUIT" << std::endl;
             return;
         }
         else
+        {
             std::cout << "Unknown command: " << cmd.command << std::endl;
+            throw Server::warnRunning(client.getSocketFD(), 421);
+        }
     }
     catch (Server::warnRunning &e)
     {

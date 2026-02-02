@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 14:32:45 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/27 15:41:24 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/02 14:18:48 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,31 @@ void nick(Server &server, Client &client, const Commands &command)
         throw Server::warnRunning(client.getSocketFD(), 433);
     std::string oldNick = client.getNickName();
     client.setNickName(newNick);
-    std::string prefix;
-    if(oldNick.empty())
-        prefix = "*";
+
+    if(client.getUserName().empty())
+        return;
+    std::string prefix = oldNick;
+    if(!prefix.empty())
+        prefix += "!~" + client.getUserName() + "@" + client.getHostName();
     else
-        prefix = oldNick;
-    std::string response = ":" + prefix + " NICK :" + newNick + "\r\n";
+        prefix = newNick + "!~" + client.getUserName() + "@" + client.getHostName();
+    std::string response = ":" + prefix + " NICK " + newNick + "\r\n";
+    std::map<std::string, Channel> &channels = server.getChannels();
+    std::map<std::string, Channel>::iterator it = channels.begin();
+    while(it != channels.end())
+    {
+        std::vector<int> &channelClients = it->second.getClients();
+        std::vector<int>::iterator clientIt = channelClients.begin();
+        while(clientIt != channelClients.end())
+        {
+            if(*clientIt == client.getSocketFD())
+            {
+                it->second.broadcastMessage(&client, response);
+                break;
+            }
+            ++clientIt;
+        }
+        ++it;
+    }
     send(client.getSocketFD(), response.c_str(), response.length(), 0);
 }

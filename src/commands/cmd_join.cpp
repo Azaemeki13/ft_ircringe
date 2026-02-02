@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_join.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 09:33:36 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/02 10:27:12 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/02 13:55:01 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,36 +62,30 @@ void join(Server &server, Client &client, const Commands &command)
 {
     std::map<std::string, std::string> server_list = parseJoin(command, client.getSocketFD());
     std::map<std::string, std::string>::iterator pr_it = server_list.begin();
-    std::map<std::string, Channel>::iterator servit;
+    
     for (; pr_it != server_list.end(); ++pr_it)
     {
-        servit = server.getChannels().find(pr_it->first);
-        // case 1 finds the channel
-        if (servit != server.getChannels().end()) // conditions en mode invite only etc a rajouter ici
+        std::map<std::string, Channel>::iterator servit = server.getChannels().find(pr_it->first);
+        if (servit != server.getChannels().end()) //if channel exists check pw
         {
-            if (servit->second.getKey() == pr_it->second) // pw matching
-            {
-                servit->second.getClients().push_back(client.getSocketFD());
-                std::stringstream ss;
-                ss << "Succesfully joined the channel " << pr_it->first << "\n";
-                std::string successMessage = ss.str();
-                send(client.getSocketFD(), successMessage.c_str(), successMessage.length(), 0);
-            }
-            else 
+            if (servit->second.getKey() != pr_it->second)
                 throw Server::warnJoin(475, client.getSocketFD(), pr_it->first);
         }
-        else
+        else //if it doesn't exist, create it
         {
-            // step 1 create channel
             server.getChannels()[pr_it->first] = Channel(pr_it->first, pr_it->second);
-            // step 2 insert the client as user AND admin 
-            // ADD ADMIN TBD 
             servit = server.getChannels().find(pr_it->first);
-            servit->second.getClients().push_back(client.getSocketFD());
-            std::stringstream ss;
-            ss << "Succesfully created the channel " << pr_it->first << "\n";
-            std::string successMessage = ss.str();
-            send(client.getSocketFD(), successMessage.c_str(), successMessage.length(), 0);
         }
+        servit->second.getClients().push_back(client.getSocketFD());
+        std::string joinMsg = ":" + client.getNickName() + "!~" + client.getUserName() + "@" +
+                              client.getHostName() + " JOIN :" + pr_it->first + "\r\n"; //broadcast
+        
+        servit->second.broadcastMessage(&client, joinMsg);
+        std::string joinMsgSelf = ":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " JOIN " + pr_it->first + "\r\n";
+        send(client.getSocketFD(), joinMsgSelf.c_str(), joinMsgSelf.length(), 0);
+        std::string namesReply = ":server 353 " + client.getNickName() + " = " + pr_it->first + " :" + client.getNickName() + "\r\n";
+        send(client.getSocketFD(), namesReply.c_str(), namesReply.length(), 0);
+        std::string endOfNames = ":server 366 " + client.getNickName() + " " + pr_it->first + " :End of /NAMES list\r\n";
+        send(client.getSocketFD(), endOfNames.c_str(), endOfNames.length(), 0);
     }
 }

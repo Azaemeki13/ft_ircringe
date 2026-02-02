@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/27 12:41:20 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 09:53:08 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/02 11:16:27 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,30 +40,33 @@ bool isValidUser(const std::string &user)
 
 bool isValidReal(const std::string &real)
 {
-    if(real[0] != ':')
-        return(false);
+    if(real.empty())
+        return(true);
+    
     size_t i = 0;
     while(i < real.size())
     {
-        if(real[i] == '\a' || real[i] == '\0' || real[i] == '\n' || real[i] == '\r' || real[i] == ':' || real[i] == '@')
+        if(real[i] == '\a' || real[i] == '\0' || real[i] == '\n' || real[i] == '\r')
             return(false);
         i++;
     }
-    std::string lowerReal = real;
-    std::transform(lowerReal.begin(), lowerReal.end(), lowerReal.begin(), ::tolower);
-    if(lowerReal.find("admin") != std::string::npos)
-        return(false);
     return(true);
 }
 
 void user(Client &client, const Commands &command)
 {
+    if(!client.getUserName().empty())
+        throw Server::warnRunning(client.getSocketFD(), 462);
+    
     if(command.params.size() != 4)
         throw Server::warnRunning(client.getSocketFD(), 461);
     std::string username = command.params[0];
     std::string realname = command.params[3];
     if(!isValidUser(username))
         throw Server::warnRunning(client.getSocketFD(), 432);
+    if(!isValidReal(realname))
+        throw Server::warnRunning(client.getSocketFD(), 432);
+    
     client.setUserName(username);
     if(realname.empty())
         client.setRealName("Anonymous");

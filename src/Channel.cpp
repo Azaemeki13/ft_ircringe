@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 13:56:15 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/02 15:27:28 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,62 @@ std::vector<int> &Channel::getClients()
 {
     return(clients);
 }
+
+const std::string &Channel::getTopic() const
+{
+    return topic;
+}
+
 const std::string Channel::getKey() const
 {
     return key;
+}
+
+void Channel::addClient(Client* client)
+{
+    clients.push_back(client->getSocketFD());
+}
+
+void Channel::addOperator(Client* client)
+{
+    operators.push_back(client->getSocketFD());
+}
+
+void Channel::removeClient(Client* client)
+{
+    std::vector<int>::iterator it = clients.begin();
+    while (it != clients.end())
+    {
+        if (*it == client->getSocketFD())
+        {
+            clients.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
+void Channel::removeOperator(Client* client)
+{
+    std::vector<int>::iterator it = operators.begin();
+    while (it != operators.end())
+    {
+        if (*it == client->getSocketFD())
+        {
+            operators.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
+void Channel::broadcastMessage(Client* fromWho, const std::string &msg)
+{
+    std::vector<int>::iterator it = clients.begin();
+    while(it != clients.end())
+    {
+        if (*it != fromWho->getSocketFD())
+            send(*it, msg.c_str(), msg.length(), 0);
+        ++it;
+    }
 }

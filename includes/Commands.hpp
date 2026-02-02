@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 11:02:01 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/02 15:03:24 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define COMMANDS_HPP
 
 #include "Client.hpp"
-#include "Parser.hpp" //to get the cmd struct, TMTC
+#include "Parser.hpp"
 #include "Server.hpp"
 
 class Server;
@@ -23,7 +23,14 @@ class Server;
 void pass(Server &server, Client &client, const Commands &command);
 void nick(Server &server, Client &client, const Commands &command);
 void user(Client &client, const Commands &command);
-void join(Server &server, Client &client, const Commands &command);
+
+//-----messaging
 void privmsg(Server &server, Client &client, const Commands &command);
+
+//-----channel management
+void join(Server &server, Client &client, const Commands &command);
+void topic(Server &server, Client &client, const Commands &command);
+/*void kick(Server &server, Client &client, const Commands &command);
+void mode(Server &server, Client &client, const Commands &command);*/
 
 #endif
