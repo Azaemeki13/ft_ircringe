@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/02 14:24:56 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/02 15:26:40 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/03 17:25:50 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 void topic(Server &server, Client &client, const Commands &command)
 {
     if(command.params.size() < 1)
-        throw Server::warnRunning(client.getSocketFD(), 461);
+        throw Server::warnRunning(client.getSocketFD(), 461); //not enough parameters
     std::string channelName = command.params[0];   
     std::map<std::string, Channel> &channels = server.getChannels();
     std::map<std::string, Channel>::iterator it = channels.find(channelName);
@@ -33,27 +33,27 @@ void topic(Server &server, Client &client, const Commands &command)
         throw Server::warnRunning(client.getSocketFD(), 403);
     Channel &channel = it->second;
     std::vector<int> &channelClients = channel.getClients();
-    std::string readyToPrint = ":server 332 " + client.getNickName() + " " + channelName + " :";
-    bool isInChannel = false;
-    std::vector<int>::iterator it2 = channelClients.begin();
-    while(it2 != channelClients.end())
-    {
-        if(*it2 == client.getSocketFD())
-        {
-            isInChannel = true;
-            break;
-        }
-        ++it2;
-    }
-    if(!isInChannel)
+    if(std::find(channelClients.begin(), channelClients.end(), client.getSocketFD()) == channelClients.end())
         throw Server::warnRunning(client.getSocketFD(), 442);
     if(command.params.size() == 1)
     {
+        std::string msg;
         if(channel.getTopic().empty())
-            readyToPrint += "No topic is set\r\n";
+            msg = ":server 331 " + client.getNickName() + " " + channelName + " :No topic is set\r\n";
         else
-            readyToPrint += channel.getTopic() + "\r\n";
-        send(client.getSocketFD(), readyToPrint.c_str(), readyToPrint.length(), 0);
+            msg = ":server 332 " + client.getNickName() + " " + channelName + " :" + channel.getTopic() + "\r\n";
+        send(client.getSocketFD(), msg.c_str(), msg.length(), 0);
         return;
     }
+    if(channel.isTopicProtected())
+    {
+        std::vector<int> &operators = channel.getOperators();
+        if(std::find(operators.begin(), operators.end(), client.getSocketFD()) == operators.end())
+            throw Server::warnRunning(client.getSocketFD(), 482); // ERR_CHANOPRIVSNEEDED
+    }
+    std::string newTopic = command.params[1];
+    channel.setTopic(newTopic);
+    std::string topicMsg = ":" + client.getNickName() + " TOPIC " + channelName + " :" + newTopic + "\r\n";
+    send(client.getSocketFD(), topicMsg.c_str(), topicMsg.length(), 0);
+    channel.broadcastMessage(&client, topicMsg);
 }

@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/02 15:26:54 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/03 17:45:12 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,6 +241,10 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
     {
         /*case 401:
             return(" :No such nick/channel")*/
+        /*case 331:
+            return(cmd.params[0] + " :No topic is set");*/
+        case 403:
+            return(cmd.params[0] + " :No such channel");
         case 411:
             return(":No recipient given" + cmd.command);
         case 421:
@@ -262,6 +266,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
         }
         case 433:
             return(cmd.params[0] + " :Nickname is already in use");
+        case 442:
+            return(cmd.params[0] + " :You're not on that channel");
         case 451:
             return(":You have not registered");
         case 461:
@@ -270,6 +276,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
             return(":Unauthorized command (already registered)");
         case 464:
             return(":Password incorrect");
+        case 482:
+            return(cmd.params[0] + " :You're not channel operator");
         default:
             return(":Unknown error"); //debug
     }

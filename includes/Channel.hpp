@@ -63,7 +63,7 @@ class Channel
         const std::string &getChannelName() const;
         const std::string &getTopic() const;
         std::vector<int> &getClients();
-        const std::vector<Client*> &getOperators() const;
+        std::vector<int> &getOperators();
 
         bool isInviteOnly() const;
         bool isTopicProtected() const;
@@ -91,7 +91,7 @@ class Channel
 
         //-----setters (channel info)
         void setChannelName(std::string &name);
-        void setTopic(std::string &topic);
+        void setTopic(const std::string &topic);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 09:33:36 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/02 13:55:01 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/03 17:20:22 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,10 @@ void join(Server &server, Client &client, const Commands &command)
         send(client.getSocketFD(), namesReply.c_str(), namesReply.length(), 0);
         std::string endOfNames = ":server 366 " + client.getNickName() + " " + pr_it->first + " :End of /NAMES list\r\n";
         send(client.getSocketFD(), endOfNames.c_str(), endOfNames.length(), 0);
+        if (!servit->second.getTopic().empty())
+        {
+            std::string topicMsg = ":server 332 " + client.getNickName() + " " + pr_it->first + " :" + servit->second.getTopic() + "\r\n";
+            send(client.getSocketFD(), topicMsg.c_str(), topicMsg.length(), 0);
+        }
     }
 }

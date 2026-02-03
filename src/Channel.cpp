@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/02 15:27:28 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/03 16:14:57 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,39 @@ std::vector<int> &Channel::getClients()
     return(clients);
 }
 
+std::vector<int> &Channel::getOperators()
+{
+    return(operators);
+}
+
 const std::string &Channel::getTopic() const
 {
     return topic;
 }
 
+void Channel::setTopic(const std::string &topic)
+{
+    this->topic = topic;
+}
+
 const std::string Channel::getKey() const
 {
     return key;
+}
+
+bool Channel::isInviteOnly() const
+{
+    return inviteOnly;
+}
+
+bool Channel::isTopicProtected() const
+{
+    return topicProtected;
+}
+
+int Channel::getUserLimit() const
+{
+    return userLimit;
 }
 
 void Channel::addClient(Client* client)
