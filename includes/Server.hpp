@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/01/28 15:26:57 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/04 09:55:43 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,9 @@ class Server
         void setPassword(const std::string &pwd);
         const std::map<int, Client>& getClients() const;
         std::map<std::string, Channel>& getChannels();
-        Client* getClientByNickname(const std::string& nickname);
+        Client *getClientByNickname(const std::string& nickname);
+        int getClientByNickname(const std::string& nickname, int flag);
+        const std::string getClientByFD(int fd); 
 
     // exceptions
         class warnRunning : public std::exception

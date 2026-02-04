@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/03 16:14:57 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/04 09:46:52 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ std::vector<int> &Channel::getClients()
 }
 
 std::vector<int> &Channel::getOperators()
+const std::vector<int> &Channel::getOperators() const
 {
     return(operators);
 }
@@ -102,6 +103,20 @@ void Channel::removeClient(Client* client)
     }
 }
 
+void Channel::removeClient(int client_fd)
+{
+    std::vector<int>::iterator it = clients.begin();
+    while (it != clients.end())
+    {
+        if (*it == client_fd)
+        {
+            clients.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
 void Channel::removeOperator(Client* client)
 {
     std::vector<int>::iterator it = operators.begin();
@@ -116,6 +131,30 @@ void Channel::removeOperator(Client* client)
     }
 }
 
+void Channel::removeOperator(int client)
+{
+    std::vector<int>::iterator it = operators.begin();
+    while (it != operators.end())
+    {
+        if (*it == client)
+        {
+            operators.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
+bool Channel::isInChannel(int client) const
+{
+    for (std::vector<int>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        if (*it == client)
+            return(1);
+    }
+    return(0);
+}
+
 void Channel::broadcastMessage(Client* fromWho, const std::string &msg)
 {
     std::vector<int>::iterator it = clients.begin();
@@ -125,4 +164,14 @@ void Channel::broadcastMessage(Client* fromWho, const std::string &msg)
             send(*it, msg.c_str(), msg.length(), 0);
         ++it;
     }
+}
+
+bool Channel::isOperator(const int client) const
+{
+    for(std::vector<int>::const_iterator it = operators.begin(); it != operators.end() ; ++it)
+    {
+        if (*it == client)
+            return(true);
+    }
+    return(false);
 }

@@ -17,7 +17,8 @@ SRC_FILES   = main.cpp \
               Server.cpp \
 			  Client.cpp \
 			  Channel.cpp \
-			  Parser.cpp
+			  Parser.cpp \
+			  Utils.cpp
 
 # Command Files (in src/commands/)
 CMD_FILES   = cmd_pass.cpp \

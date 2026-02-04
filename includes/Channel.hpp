@@ -6,7 +6,7 @@
 /*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 14:20:36 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/03 16:07:38 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ class Channel
         const std::string &getTopic() const;
         std::vector<int> &getClients();
         std::vector<int> &getOperators();
+        const std::vector<int> &getOperators() const;
 
         bool isInviteOnly() const;
         bool isTopicProtected() const;
@@ -73,12 +74,14 @@ class Channel
         //-----client management
         void addClient(Client* client);
         void removeClient(Client* client);
-        void isInChannel(Client* client) const;
+        void removeClient(int client_fd);
+        bool isInChannel(int client) const;
 
         //-----operator management 
         void addOperator(Client* client);
         void removeOperator(Client* client);
-        void isOperator(Client* client) const;
+        void removeOperator(int client);
+        bool isOperator(const int client) const;
 
         //-----broadcast messaging
         void broadcastMessage(Client* fromWho, const std::string &msg);

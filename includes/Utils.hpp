@@ -14,7 +14,8 @@
 #define UTILS_HPP
 
 #include <string>
+#include "Server.hpp"
 
-
+void handleExceptions(const Server::warnJoin &e, Client &client, Server &server);
 
 #endif

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/03 17:45:12 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/04 09:55:59 by cauffret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "Utils.hpp"
 
 // OCF 
 
@@ -220,6 +221,29 @@ std::string Server::getPassword() const
     return password;
 }
 
+int Server::getClientByNickname(const std::string& nickname, int flag)
+{
+    (void)flag;
+    std::map<int, Client>::iterator clit = clients.begin();
+    for(; clit != clients.end(); ++clit)
+    {
+        if (clit->second.getNickName() == nickname)
+            return clit->second.getSocketFD();
+    }
+    return(-1);
+}
+
+const std::string Server::getClientByFD(int fd)
+{
+    std ::string result = "";
+    std::map<int, Client>::iterator clit = clients.find(fd);
+    if (clit == getClients().end())
+        return(result);
+    else
+        return (clit->second.getNickName());
+
+}
+
 void Server::setPassword(const std::string &pwd)
 {
     password = pwd;
@@ -337,6 +361,8 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
             std::cout << "Client requested QUIT" << std::endl;
             return;
         }
+        else if (cmd.command == "KICK")
+            kick(*this, client, cmd);
         else
         {
             std::cout << "Unknown command: " << cmd.command << std::endl;
@@ -350,35 +376,6 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     }
     catch(Server::warnJoin &e)
     {
-        std::stringstream codeStream;
-        codeStream << e.getErrorCode();
-        std::string errorCode = codeStream.str();
-        
-        switch (e.getErrorCode())
-        {   
-            case 461 :
-            {
-                sendError(client, errorCode, "JOIN :Not enough parameters.");
-                return;
-            }
-            case 479 :
-            {
-                sendError(client, errorCode, "JOIN : ERR_BADCHANNAME");
-                return;
-            }
-            case 475 :
-            {
-                std::stringstream ss;
-                ss << "JOIN: " << e.getChannelName() << " Password mismatch or no password put, please enter one.";
-                std::string error_msg = ss.str();
-                sendError(client, errorCode, error_msg);
-                return;
-            }
-            default :
-            {
-                sendError(client, "404", "Unknown error message.");
-            }
-        }
-
+        handleExceptions(e, client, *this);
     }
 }
