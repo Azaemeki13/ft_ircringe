@@ -24,10 +24,10 @@ SRC_FILES   = main.cpp \
 CMD_FILES   = cmd_pass.cpp \
 			  cmd_nick.cpp \
 			  cmd_user.cpp \
-			  cmd_auth.cpp \
 			  cmd_join.cpp \
 			  cmd_kick.cpp \
 			  cmd_mode.cpp \
+			  cmd_pong.cpp \
 			  cmd_privmsg.cpp \
 			  cmd_topic.cpp
 

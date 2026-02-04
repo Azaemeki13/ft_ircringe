@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/04 09:55:59 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/04 16:32:18 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -345,17 +345,11 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
         else if (cmd.command == "PRIVMSG")
             privmsg(*this, client, cmd);
         else if (cmd.command == "PING")
-        {
-            std::string pong;
-            if (cmd.params.size() > 0)
-                pong = "PONG server :" + cmd.params[0] + "\r\n";
-            else
-                pong = "PONG server\r\n";
-            send(client.getSocketFD(), pong.c_str(), pong.length(), 0);
-            return;
-        }
+            pong(client, cmd);
         else if(cmd.command == "TOPIC")
             topic(*this, client, cmd);
+        else if(cmd.command == "MODE")
+            mode(*this, client, cmd);
         else if (cmd.command == "QUIT")
         {
             std::cout << "Client requested QUIT" << std::endl;

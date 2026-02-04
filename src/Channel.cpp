@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/04 09:46:52 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/04 17:39:57 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,4 +179,34 @@ bool Channel::isOperator(const int client) const
             return(true);
     }
     return(false);
+}
+
+const std::string &Channel::getChannelName() const
+{
+    return channelName;
+}
+
+void Channel::setInviteOnly(bool state)
+{
+    inviteOnly = state;
+}
+
+void Channel::setTopicProtected(bool state)
+{
+    topicProtected = state;
+}
+
+void Channel::setKey(const std::string &key)
+{
+    this->key = key;
+}
+
+void Channel::setUserLimit(int limit)
+{
+    userLimit = limit;
+}
+
+void Channel::setChannelName(std::string &name)
+{
+    channelName = name;
 }

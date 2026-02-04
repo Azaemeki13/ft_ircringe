@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_join.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 09:33:36 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/03 14:24:47 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/04 17:36:25 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,9 @@ void join(Server &server, Client &client, const Commands &command)
         {
             if (servit->second.getKey() != pr_it->second)
                 throw Server::warnJoin(client.getSocketFD(), 475, pr_it->first);
+            if (servit->second.isInviteOnly())
+                throw Server::warnJoin(client.getSocketFD(), 473, pr_it->first);
+            
         }
         else //if it doesn't exist, create it
         {
@@ -85,7 +88,6 @@ void join(Server &server, Client &client, const Commands &command)
         servit->second.getClients().push_back(client.getSocketFD());
         std::string joinMsg = ":" + client.getNickName() + "!~" + client.getUserName() + "@" +
                               client.getHostName() + " JOIN :" + pr_it->first + "\r\n"; //broadcast
-        
         servit->second.broadcastMessage(&client, joinMsg);
         std::string joinMsgSelf = ":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " JOIN " + pr_it->first + "\r\n";
         send(client.getSocketFD(), joinMsgSelf.c_str(), joinMsgSelf.length(), 0);

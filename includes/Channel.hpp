@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/03 16:07:38 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/04 17:39:39 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ class Channel
         //-----setters (mode options)
         void setInviteOnly(bool state);
         void setTopicProtected(bool state);
-        void setKey(std::string &key); //string empty = remove key
+        void setKey(const std::string &key); //string empty = remove key
         void setUserLimit(int limit);
 
         //-----setters (channel info)
