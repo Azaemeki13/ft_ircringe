@@ -43,8 +43,13 @@ std::vector<int> &Channel::getClients()
     return(clients);
 }
 
-std::vector<int> &Channel::getOperators()
 const std::vector<int> &Channel::getOperators() const
+{
+    return(operators);
+}
+
+
+std::vector<int> &Channel::getOperators()
 {
     return(operators);
 }
