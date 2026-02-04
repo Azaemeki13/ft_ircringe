@@ -90,7 +90,7 @@ void handleExceptions(const Server::warnJoin &e, Client &client, Server &server)
 
         default:
         {
-            server.sendError(client, "400", ":Unknown Error during Join");
+            server.sendError(client, errorCode, ":Unknown Error during Join");
             break;
         }
 

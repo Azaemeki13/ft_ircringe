@@ -69,11 +69,13 @@ void sendToUser(Server &server, Client &client, const std::string &receiver, con
     send(recipient->getSocketFD(), messageReady.c_str(), messageReady.length(), 0);
 }
 
-void sendToChannel(Server &server, Client &client, const std::string channel, const std::string &messageToSend)
+void sendToChannel(Server &server, Client &client, const std::string &channel, const std::string &messageToSend)
 {
     std::map<std::string, Channel>::iterator channel_it = server.getChannels().find(channel);
     if (channel_it == server.getChannels().end())
         throw Server::warnJoin(client.getSocketFD(), 403, channel);
+    if (channel_it->second.isInChannel(client.getSocketFD()) == false)
+        throw Server::warnJoin(client.getSocketFD(), 442, channel);
     std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + channel_it->first + " :" + messageToSend + "\r\n"; 
     std::vector<int> &chan_clients = channel_it->second.getClients();
     std::vector<int>::iterator browse;

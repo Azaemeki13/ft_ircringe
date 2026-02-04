@@ -34,7 +34,7 @@ std::map<std::string, std::string> parseJoin(const Commands &command, int client
 {
     std::map<std::string, std::string> result;
     if(command.params.empty())
-        throw Server::warnJoin(461, client_fd, "");
+        throw Server::warnJoin(client_fd, 461, "");
         //return server.sendError(client, "461", "JOIN :Not enough parameters");
     std::vector<std::string> channels_n = split(command.params[0], ',');
     std::vector<std::string> channels_p;
@@ -53,7 +53,7 @@ std::map<std::string, std::string> parseJoin(const Commands &command, int client
                 result.insert(std::make_pair(channels_n[i], ""));
         }
         else 
-            throw Server::warnJoin(479, client_fd, name);
+            throw Server::warnJoin(client_fd, 479, name);
     }
     return(result);
 }
@@ -66,16 +66,22 @@ void join(Server &server, Client &client, const Commands &command)
     for (; pr_it != server_list.end(); ++pr_it)
     {
         std::map<std::string, Channel>::iterator servit = server.getChannels().find(pr_it->first);
+        bool isNewChannel = 0;
         if (servit != server.getChannels().end()) //if channel exists check pw
         {
             if (servit->second.getKey() != pr_it->second)
-                throw Server::warnJoin(475, client.getSocketFD(), pr_it->first);
+                throw Server::warnJoin(client.getSocketFD(), 475, pr_it->first);
         }
         else //if it doesn't exist, create it
         {
             server.getChannels()[pr_it->first] = Channel(pr_it->first, pr_it->second);
             servit = server.getChannels().find(pr_it->first);
+            isNewChannel = 1;
         }
+        if (isNewChannel)
+            servit->second.addOperator(&client);
+        if (servit->second.isInChannel(client.getSocketFD()))
+            continue;
         servit->second.getClients().push_back(client.getSocketFD());
         std::string joinMsg = ":" + client.getNickName() + "!~" + client.getUserName() + "@" +
                               client.getHostName() + " JOIN :" + pr_it->first + "\r\n"; //broadcast
