@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_privmsg.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/28 10:42:59 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/02 10:17:12 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/06 11:03:39 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,6 @@
    Parameters: <receiver>{,<receiver>} <text to be sent>*/
 
 //bool isValidReciever(Server &server, const std::string &receiver)
-
-Client* Server::getClientByNickname(const std::string& nickname)
-{
-    std::map<int, Client>& clients = const_cast<std::map<int, Client>&>(getClients());
-    std::map<int, Client>::iterator it = clients.begin();
-
-    while(it != clients.end())
-    {
-        if(it->second.getNickName() == nickname)
-            return &(it->second);
-        it++;
-    }
-    return NULL;
-}
 
 bool isReceiverFound(Server &server, const std::string &receiver)
 {
@@ -62,9 +48,10 @@ bool isReceiverFound(Server &server, const std::string &receiver)
 
 void sendToUser(Server &server, Client &client, const std::string &receiver, const std::string &messageToSend)
 {
-    Client *recipient = server.getClientByNickname(receiver);
-    if(!recipient)
+    int recipientFD = server.getClientByNickname(receiver);
+    if(recipientFD == -1)
         throw Server::warnRunning(client.getSocketFD(), 401);
+    Client *recipient = &server.getClients()[recipientFD];
     std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + receiver + " :" + messageToSend + "\r\n";
     send(recipient->getSocketFD(), messageReady.c_str(), messageReady.length(), 0);
 }

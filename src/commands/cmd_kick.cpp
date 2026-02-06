@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_kick.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/03 14:10:55 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/04 10:10:11 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/06 10:58:06 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void kick(Server &server, Client &client, const Commands &command)
     std::vector<std::string>::iterator name_it;
     for (name_it = targets.begin(); name_it != targets.end(); ++name_it)
     {
-        int victim = server.getClientByNickname(*name_it, 1);
+        int victim = server.getClientByNickname(*name_it);
         if (victim == -1)
         {
             server.sendError(client, "401", *name_it);

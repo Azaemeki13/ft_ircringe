@@ -29,7 +29,8 @@ CMD_FILES   = cmd_pass.cpp \
 			  cmd_mode.cpp \
 			  cmd_pong.cpp \
 			  cmd_privmsg.cpp \
-			  cmd_topic.cpp
+			  cmd_topic.cpp \
+			  cmd_invite.cpp
 
 # Add the path prefix to files (src/main.cpp and src/commands/cmd_pass.cpp)
 SRCS        = $(addprefix $(SRC_DIR)/, $(SRC_FILES)) $(addprefix $(CMD_DIR)/, $(CMD_FILES))

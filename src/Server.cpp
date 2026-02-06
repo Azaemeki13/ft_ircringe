@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/04 16:32:18 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/06 14:00:51 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,9 +221,8 @@ std::string Server::getPassword() const
     return password;
 }
 
-int Server::getClientByNickname(const std::string& nickname, int flag)
+int Server::getClientByNickname(const std::string& nickname)
 {
-    (void)flag;
     std::map<int, Client>::iterator clit = clients.begin();
     for(; clit != clients.end(); ++clit)
     {
@@ -254,6 +253,11 @@ const std::map<int, Client>& Server::getClients() const
     return clients;
 }
 
+std::map<int, Client>& Server::getClients()
+{
+    return clients;
+}
+
 std::map<std::string, Channel>& Server::getChannels()
 {
     return channels;
@@ -263,10 +267,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
 {
     switch(code)
     {
-        /*case 401:
-            return(" :No such nick/channel")*/
-        /*case 331:
-            return(cmd.params[0] + " :No topic is set");*/
+        case 401:
+            return(cmd.params[0] + " :No such nick/channel");
         case 403:
             return(cmd.params[0] + " :No such channel");
         case 411:
@@ -300,6 +302,8 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
             return(":Unauthorized command (already registered)");
         case 464:
             return(":Password incorrect");
+        case 472:
+            return(":Unknown MODE flag");
         case 482:
             return(cmd.params[0] + " :You're not channel operator");
         default:
@@ -350,6 +354,8 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
             topic(*this, client, cmd);
         else if(cmd.command == "MODE")
             mode(*this, client, cmd);
+        else if(cmd.command == "INVITE")
+            invite(*this, client, cmd);
         else if (cmd.command == "QUIT")
         {
             std::cout << "Client requested QUIT" << std::endl;

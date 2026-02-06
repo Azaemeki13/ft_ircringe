@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/04 17:39:57 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/06 14:05:16 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,4 +209,35 @@ void Channel::setUserLimit(int limit)
 void Channel::setChannelName(std::string &name)
 {
     channelName = name;
+}
+
+void Channel::addInvitedUser(int client_fd)
+{
+    invitedUsers.push_back(client_fd);
+}
+
+void Channel::removeInvitedUser(int client_fd)
+{
+    std::vector<int>::iterator it = invitedUsers.begin();
+    while(it != invitedUsers.end())
+    {
+        if (*it == client_fd)
+        {
+            invitedUsers.erase(it);
+            return;
+        }
+        ++it;
+    }
+}
+
+bool Channel::isInvited(int client_fd) const
+{
+    std::vector<int>::const_iterator it = invitedUsers.begin();
+    while(it != invitedUsers.end())
+    {
+        if (*it == client_fd)
+            return true;
+        it++;
+    }
+    return false;
 }

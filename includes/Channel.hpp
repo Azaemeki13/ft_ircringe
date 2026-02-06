@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:49 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/04 17:39:39 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/06 13:45:43 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,11 @@ class Channel
         //-----setters (channel info)
         void setChannelName(std::string &name);
         void setTopic(const std::string &topic);
+
+        std::vector<int> invitedUsers;
+        void addInvitedUser(int client_fd);
+        void removeInvitedUser(int client_fd);
+        bool isInvited(int client_fd) const;
 };
 
 #endif

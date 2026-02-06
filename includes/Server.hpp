@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:48:46 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/04 09:55:43 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/02/06 11:02:41 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,9 @@ class Server
         std::string getPassword() const;
         void setPassword(const std::string &pwd);
         const std::map<int, Client>& getClients() const;
+        std::map<int, Client>& getClients();
         std::map<std::string, Channel>& getChannels();
-        Client *getClientByNickname(const std::string& nickname);
-        int getClientByNickname(const std::string& nickname, int flag);
+        int getClientByNickname(const std::string& nickname);
         const std::string getClientByFD(int fd); 
 
     // exceptions

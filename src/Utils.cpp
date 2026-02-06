@@ -63,14 +63,21 @@ void handleExceptions(const Server::warnJoin &e, Client &client, Server &server)
   
         case 473: // ERR_INVITEONLYCHAN
         {
-            std::string msg = "JOIN " + e.getChannelName() + " :Cannot join channel (+i) - Invite only";
+            std::string msg = e.getChannelName() + " :Cannot join channel (+i) - Invite only";
+            server.sendError(client, errorCode, msg);
+            break;
+        }
+
+        case 471: // ERR_CHANNELISFULL
+        {
+            std::string msg = e.getChannelName() + " :Cannot join channel (+l) - Channel is full";
             server.sendError(client, errorCode, msg);
             break;
         }
 
         case 475: // ERR_BADCHANNELKEY
         {
-            std::string msg = "JOIN " + e.getChannelName() + " :Cannot join channel (+k) - Bad Key";
+            std::string msg = e.getChannelName() + " :Cannot join channel (+k) - Bad Key";
             server.sendError(client, errorCode, msg);
             break;
         }
