@@ -12,6 +12,15 @@
 
 #include "Server.hpp"
 
+bool server_running = 1;
+
+void signal_handler(int signum)
+{
+    void(signum);
+    std::cout << "Signal received ! shutting down" << std::endl;
+    server_running = 0;
+}
+
 int main (int argc, char **argv)
 {
     if (argc != 3)
@@ -21,10 +30,12 @@ int main (int argc, char **argv)
     }
     int port = std::atoi(argv[1]);
     std::string password = argv[2];
+    signal(SIGPIPE, SIG_IGN);
+    signal(SIGINT, signal_handler);
+    signal(SIGQUIT, signal_handler);
     try
     {
-        Server serv(port);
-        serv.setPassword(password);
+        Server serv(port, password);
         
         // Test: Create a dummy client and send error
         Client testClient(0, "127.0.0.1");

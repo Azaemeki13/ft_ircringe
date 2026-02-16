@@ -19,6 +19,7 @@
 #include "Commands.hpp"
 #include <algorithm>
 #include <sys/socket.h>
+#include <csignal>
 #include <netdb.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
@@ -65,12 +66,14 @@ class Server
     // Allocs
         Server();
         Server(int port);
+        Server(int port, std::string password);
         ~Server();
         
     // loop xdxd
         void run(); 
 
-    // error handling
+    // error han    dling && fucking ddos protection (flood)
+        void removeKickedClient(int fd);
         void sendError(Client &client, const std::string &code, const std::string &message);
         std::string getErrorMessage(int code, const Commands &cmd) const;
 
@@ -82,7 +85,8 @@ class Server
         std::map<int, Client>& getClients();
         std::map<std::string, Channel>& getChannels();
         int getClientByNickname(const std::string& nickname);
-        const std::string getClientByFD(int fd); 
+        const std::string getClientByFD(int fd);
+        Client *getClientPoint(int fd);
 
     // exceptions
         class warnRunning : public std::exception

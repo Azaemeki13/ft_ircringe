@@ -29,6 +29,13 @@ Server::Server(int port)
     std::cout << "Parameterised constructor called for Server." << std::endl;
 }
 
+Server::Server(int port, std::string password) : password(password)
+{
+    channels.insert(std::make_pair("general", Channel("general")));
+    initServ(port);
+    std::cout << "Parameterised constructor called for Server." << std::endl;
+}
+
 Server::~Server()
 {
     if (listener != -1)
@@ -44,6 +51,7 @@ void Server::initServ(int port)
     std::memset(&serv_addr, 0, sizeof(serv_addr));
     if ((listener = socket(AF_INET6, SOCK_STREAM, 0)) < 0)
         throw std::runtime_error("Failed to create socket: " + std::string(strerror(errno)));
+    fcntl(listener, F_SETFL, O_NONBLOCK);
     // then I need to set my options for my socket, the fact I can reuse adress if spamming ./myprog 
     int opt = 1;
     if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
@@ -73,24 +81,21 @@ void Server::initServ(int port)
 void Server::run()
 {
     int event_count;
-    std::cout << "Server is running (Epoll mode) ... " << std::endl;
-    while(true)
+
+    event_count = epoll_wait(epfd, events, MAX_EVENTS, 10);
+    if (event_count == -1)
     {
-        event_count = epoll_wait(epfd, events, MAX_EVENTS, - 1);
-        if (event_count == -1)
-        {
-            if (errno == EINTR)
-                continue;            
-            throw std::runtime_error("Epoll wait failed.");
-        }
-        for (int i = 0 ; i < event_count; ++i)
-        {
-            int current_fd = events[i].data.fd;
-            if (current_fd == listener)
-                handleNewConnection();
-            else
-                handleClientMessage(current_fd);
-        }
+        if (errno == EINTR)
+            return;            
+        throw std::runtime_error("Epoll wait failed.");
+    }
+    for (int i = 0 ; i < event_count; ++i)
+    {
+        int current_fd = events[i].data.fd;
+        if (current_fd == listener)
+            handleNewConnection();
+        else
+            handleClientMessage(current_fd);
     }
 }
 
@@ -125,6 +130,7 @@ void Server::handleClientMessage(int fd)
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
     ssize_t bytes_read = recv(fd, buffer, sizeof(buffer), 0);
+
     if (bytes_read <= 0)
     {
         std::cout << "Client " << fd << " disconnected." << std::endl;
@@ -135,6 +141,19 @@ void Server::handleClientMessage(int fd)
     }
     Client &currentUser = clients[fd];
     currentUser.getBuffer().append(buffer, bytes_read);
+    if (currentUser.getBuffer().size() > 512)
+    {
+        if (fd == -1)
+            throw (Server::warnRunning(fd, 401));
+        std::string messageReady = "GET KICKED FOR FLOODING MEANIE :)\r\n";
+        send(fd, messageReady.c_str(), messageReady.length(), 0);
+        removeKickedClient(fd);
+        shutdown(fd, SHUT_WR);
+        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+        close(fd);
+        clients.erase(fd);
+        return;
+    }
     size_t pos = 0;
     while ((pos = currentUser.getBuffer().find('\n')) != std::string::npos)
     {
@@ -205,6 +224,17 @@ const char *Server::warnJoin::what() const throw()
 Server::warnJoin::~warnJoin() throw()
 {}
 
+void Server::removeKickedClient(int fd)
+{
+    std::map<std::string, Channel>::iterator it = channels.begin();
+    while (it != channels.end())
+    {
+        it->second.removeClient(fd);
+        it->second.removeOperator(fd);
+        ++it;
+    }
+}
+
 void Server::sendError(Client &client, const std::string &code, const std::string &message)
 {
     std::string nickname;
@@ -212,7 +242,7 @@ void Server::sendError(Client &client, const std::string &code, const std::strin
         nickname = "*";
     else
         nickname = client.getNickName();
-    std::string errorMsg = ":server " + code + " " + nickname + " " + message + "\r\n";
+    std::string errorMsg = ":server Error code: " + code + " " + nickname + " " + message + "\r\n";
     send(client.getSocketFD(), errorMsg.c_str(), errorMsg.length(), 0);
 }
 
@@ -241,6 +271,15 @@ const std::string Server::getClientByFD(int fd)
     else
         return (clit->second.getNickName());
 
+}
+
+Client *Server::getClientPoint(int fd)
+{
+    std::map<int, Client>::iterator it = clients.find(fd);
+    if (it == getClients().end())
+        return NULL;
+    else
+        return &(it->second);
 }
 
 void Server::setPassword(const std::string &pwd)
