@@ -12,13 +12,14 @@
 
 #include "Commands.hpp"
 
-void pong(Client &client, const Commands &command)
+void pong(Server &server, Client &client, const Commands &command)
 {
     std::string pong;
     if (command.params.size() > 0)
         pong = "PONG server :" + command.params[0] + "\r\n";
     else
         pong = "PONG server\r\n";
-    send(client.getSocketFD(), pong.c_str(), pong.length(), 0);
+    client.addTowBuffer(pong);
+    server.enableWriteEvent(client.getSocketFD());
     return;
 }

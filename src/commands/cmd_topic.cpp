@@ -42,7 +42,8 @@ void topic(Server &server, Client &client, const Commands &command)
             msg = ":server 331 " + client.getNickName() + " " + channelName + " :No topic is set\r\n";
         else
             msg = ":server 332 " + client.getNickName() + " " + channelName + " :" + channel.getTopic() + "\r\n";
-        send(client.getSocketFD(), msg.c_str(), msg.length(), 0);
+        client.addTowBuffer(msg);
+        server.enableWriteEvent(client.getSocketFD());
         return;
     }
     if(channel.isTopicProtected())
@@ -54,6 +55,7 @@ void topic(Server &server, Client &client, const Commands &command)
     std::string newTopic = command.params[1];
     channel.setTopic(newTopic);
     std::string topicMsg = ":" + client.getNickName() + " TOPIC " + channelName + " :" + newTopic + "\r\n";
-    send(client.getSocketFD(), topicMsg.c_str(), topicMsg.length(), 0);
-    channel.broadcastMessage(&client, topicMsg);
+    client.addTowBuffer(topicMsg);
+    server.enableWriteEvent(client.getSocketFD());
+    channel.broadcastMessage(server,client.getSocketFD(), topicMsg);
 }

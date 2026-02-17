@@ -60,6 +60,8 @@ class Server
         void initServ(int port);
         void handleNewConnection();
         void handleClientMessage(int fd);
+        void handleClientWrite(int fd);
+        void disableWriteEvent(int fd);
         void processCommand(Client &client, const std::string &message);
         
     public : 
@@ -72,7 +74,7 @@ class Server
     // loop xdxd
         void run(); 
 
-    // error han    dling && fucking ddos protection (flood)
+    // error handling && fucking ddos protection (flood)
         void removeKickedClient(int fd);
         void sendError(Client &client, const std::string &code, const std::string &message);
         std::string getErrorMessage(int code, const Commands &cmd) const;
@@ -88,7 +90,7 @@ class Server
         const std::string getClientByFD(int fd);
         Client *getClientPoint(int fd);
 
-    // exceptions
+    // exceptions && errors 
         class warnRunning : public std::exception
         {
             private:
@@ -117,6 +119,9 @@ class Server
                 virtual ~warnJoin() throw();
         };
         void handleError(const warnRunning &e, Client &client, const Commands &cmd);
+
+        // sending f(x)
+        void enableWriteEvent(int fd);
 };
 
 

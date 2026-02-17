@@ -53,6 +53,7 @@ class Client
             std::string realName;
             std::string hostName;
             std::string buffer;
+            std::string writeBuffer;
 
             std::vector<std::string> channels;
             std::vector<std::string> joinedChannels;
@@ -68,6 +69,7 @@ class Client
         void setUserName(const std::string &user);
         void setRealName(const std::string &real);
         void setHostName(const std::string &host);
+        void addTowBuffer(const std::string &msg);
 
     //-----getters 
         int getSocketFD() const;
@@ -78,6 +80,7 @@ class Client
         std::string &getRealName();
         std::string &getHostName();
         std::string &getBuffer();
+        std::string &getWriteBuffer();
         
         const std::string &getNickName() const;
         const std::string &getUserName() const;

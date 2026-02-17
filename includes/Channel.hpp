@@ -35,6 +35,8 @@
 #include <exception>
 #include <sstream>
 
+class Server;
+
 class Channel 
 {
     private:
@@ -84,7 +86,7 @@ class Channel
         bool isOperator(const int client) const;
 
         //-----broadcast messaging
-        void broadcastMessage(Client* fromWho, const std::string &msg);
+        void broadcastMessage(Server &server, int sender_fd, const std::string &msg);
         
         //-----setters (mode options)
         void setInviteOnly(bool state);

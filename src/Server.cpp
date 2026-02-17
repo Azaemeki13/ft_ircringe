@@ -62,12 +62,12 @@ void Server::initServ(int port)
     serv_addr.sin6_family = AF_INET6;
     if (port != 0)
         serv_addr.sin6_port = htons(port);
-    else 
+    else    
         serv_addr.sin6_port = htons(PORT);
     serv_addr.sin6_addr = in6addr_any;
     if(bind(listener, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) // cast here not in ipv6 struct because bind is unvisersal
         throw std::runtime_error("Bind failed: " + std::string(strerror(errno)));
-    if (listen(listener, 10) < 0)
+    if (listen(listener,  SOMAXCONN) < 0)
         throw std::runtime_error("Listened failed: " + std::string(strerror(errno)));
     if ((epfd = epoll_create1(0))  == -1)
         throw std::runtime_error("epoll_create1 failed.");
@@ -82,7 +82,7 @@ void Server::run()
 {
     int event_count;
 
-    event_count = epoll_wait(epfd, events, MAX_EVENTS, 10);
+    event_count = epoll_wait(epfd, events, MAX_EVENTS, 1);
     if (event_count == -1)
     {
         if (errno == EINTR)
@@ -92,10 +92,24 @@ void Server::run()
     for (int i = 0 ; i < event_count; ++i)
     {
         int current_fd = events[i].data.fd;
+        uint32_t current_events = events[i].events;
         if (current_fd == listener)
+        {
             handleNewConnection();
-        else
+            continue;
+        }
+        if (current_events & EPOLLIN)
             handleClientMessage(current_fd);
+        if (current_events & EPOLLOUT)
+            handleClientWrite(current_fd);
+        if (current_events & (EPOLLERR | EPOLLHUP))
+        {
+            removeKickedClient(current_fd);
+            epoll_ctl(epfd, EPOLL_CTL_DEL, current_fd, NULL);
+            close(current_fd);
+            clients.erase(current_fd);
+        }
+        std::cout << "FD" << current_fd << "HAS BEEN FULLY PURGED MOUAHAHA" << std::endl;
     }
 }
 
@@ -103,7 +117,9 @@ void Server::handleNewConnection()
 {
     struct sockaddr_in6 client_addr;
     socklen_t addr_len = sizeof(client_addr);
-    int new_fd = accept(listener, (struct sockaddr *) &client_addr, &addr_len);
+    int new_fd;
+
+    new_fd = accept(listener, (struct sockaddr *) &client_addr, &addr_len);
     if (new_fd == -1)
     {
         std::cerr << "Error accepting connection" << std::endl; // maybe unique exception here
@@ -111,8 +127,13 @@ void Server::handleNewConnection()
     }
     char client_ip[INET6_ADDRSTRLEN];
     inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip, INET6_ADDRSTRLEN);
-    std::cout << "Accepted connection from: " << client_ip << std::endl;
-    fcntl(new_fd, F_SETFL, O_NONBLOCK);
+    // std::cout << "Accepted connection from: " << client_ip << std::endl; DEBUG
+    if (fcntl(new_fd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        std::cerr << "fcntl" << std::endl;
+        close(new_fd);
+        return;
+    }
     Client new_client(new_fd, client_ip);
     clients.insert(std::make_pair(new_fd, new_client));
     fd_ev.events = EPOLLIN;
@@ -129,7 +150,7 @@ void Server::handleClientMessage(int fd)
 {
     char buffer[1024];
     std::memset(buffer, 0, sizeof(buffer));
-    ssize_t bytes_read = recv(fd, buffer, sizeof(buffer), 0);
+    ssize_t bytes_read = recv(fd, buffer, sizeof(buffer) - 1, 0);
 
     if (bytes_read <= 0)
     {
@@ -146,7 +167,8 @@ void Server::handleClientMessage(int fd)
         if (fd == -1)
             throw (Server::warnRunning(fd, 401));
         std::string messageReady = "GET KICKED FOR FLOODING MEANIE :)\r\n";
-        send(fd, messageReady.c_str(), messageReady.length(), 0);
+        currentUser.addTowBuffer(messageReady);
+        this->enableWriteEvent(fd);
         removeKickedClient(fd);
         shutdown(fd, SHUT_WR);
         epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
@@ -169,6 +191,54 @@ void Server::handleClientMessage(int fd)
         }
         currentUser.getBuffer().erase(0, pos + 1);
     }
+}
+
+void Server::handleClientWrite(int fd)
+{
+    std::map<int, Client>::iterator it = clients.find(fd);
+    if (it == clients.end())
+        return;
+    Client &c = it->second;
+    std::string &buffer = c.getWriteBuffer();
+    if (buffer.empty())
+    {
+        disableWriteEvent(fd);
+        return;
+    }
+    ssize_t bytes_sent = send(fd, buffer.c_str(), buffer.length(), 0);
+    if (bytes_sent > 0)
+    {
+        buffer.erase(0, bytes_sent);
+        if (buffer.empty())
+            disableWriteEvent(fd);
+    }
+    else if (bytes_sent == -1)
+    {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            return;
+    }
+    else
+        std::cerr << "Send failed." << std::endl;
+}
+
+void Server::disableWriteEvent(int fd)
+{
+    struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
+    ev.events = EPOLLIN;
+    ev.data.fd = fd;
+    if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
+        std::cerr << "epoll_ctl disable write." << std::endl;
+}
+
+void Server::enableWriteEvent(int fd)
+{
+    struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
+    ev.events = EPOLLIN | EPOLLOUT;
+    ev.data.fd = fd;
+    if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
+        std::cerr << "epoll_ctl enable write." << std::endl;
 }
 
 Server::warnRunning::warnRunning(int fd, int code) : client_fd(fd), errorCode(code)
@@ -243,7 +313,8 @@ void Server::sendError(Client &client, const std::string &code, const std::strin
     else
         nickname = client.getNickName();
     std::string errorMsg = ":server Error code: " + code + " " + nickname + " " + message + "\r\n";
-    send(client.getSocketFD(), errorMsg.c_str(), errorMsg.length(), 0);
+    client.addTowBuffer(errorMsg);
+    this->enableWriteEvent(client.getSocketFD());
 }
 
 std::string Server::getPassword() const
@@ -382,13 +453,13 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
         if (cmd.command == "NICK")
             nick(*this, client, cmd);
         else if (cmd.command == "USER")
-            user(client, cmd);
+            user(*this, client, cmd);
         else if (cmd.command == "JOIN")
             join(*this, client, cmd);
         else if (cmd.command == "PRIVMSG")
             privmsg(*this, client, cmd);
         else if (cmd.command == "PING")
-            pong(client, cmd);
+            pong(*this ,client, cmd);
         else if(cmd.command == "TOPIC")
             topic(*this, client, cmd);
         else if(cmd.command == "MODE")

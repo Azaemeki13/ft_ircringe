@@ -64,9 +64,18 @@ void kick(Server &server, Client &client, const Commands &command)
         if (!channel.isInChannel(victim))
             throw Server::warnJoin(client.getSocketFD(), 441, *name_it + " " + channel_name);
         std::stringstream ss;
-        ss << ":" << client.getNickName() << "!" << client.getUserName() << "@"  << client.getHostName() << " KICK " << channel_name << " " << *name_it << reason << "\r\n";        std::string kickMsg = ss.str();
-        channel.broadcastMessage(&client, kickMsg);
-        send(client.getSocketFD(), kickMsg.c_str(), kickMsg.length(), 0);
+        ss << ":" << client.getNickName() << "!" << client.getUserName() << "@"  << client.getHostName() << " KICK " << channel_name << " " << *name_it << reason << "\r\n";
+        std::string kickMsg = ss.str();
+        channel.broadcastMessage(server,client.getSocketFD(), kickMsg);
+        client.addTowBuffer(kickMsg);
+        server.enableWriteEvent(client.getSocketFD());
+        Client *victime = server.getClientPoint(victim);
+        if (victime)
+        {
+            victime->addTowBuffer(kickMsg);
+            server.enableWriteEvent(victim);
+
+        }
         if (channel.isOperator(victim))
             channel.removeOperator(victim);
         channel.removeClient(victim);

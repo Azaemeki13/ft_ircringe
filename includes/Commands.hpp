@@ -17,14 +17,15 @@
 #include "Parser.hpp"
 #include "Server.hpp"
 #include "Channel.hpp"
+#include <set>
 
 class Server;
 
 //-----authentification flow
 void pass(Server &server, Client &client, const Commands &command);
 void nick(Server &server, Client &client, const Commands &command);
-void user(Client &client, const Commands &command);
-void pong(Client &client, const Commands &command);
+void user(Server &server, Client &client, const Commands &command);
+void pong(Server &server, Client &client, const Commands &command);
 
 //-----messaging
 void privmsg(Server &server, Client &client, const Commands &command);

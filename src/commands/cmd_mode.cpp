@@ -12,7 +12,7 @@
 
 #include "Server.hpp"
 
-void modeI(const Client &client, Channel* channel, bool add)
+void modeI(Server &server, const Client &client, Channel* channel, bool add)
 {
     if(channel->isOperator(client.getSocketFD()))
     {
@@ -24,19 +24,13 @@ void modeI(const Client &client, Channel* channel, bool add)
             mode = "-i";
         std::string modeMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + 
             " MODE " + channel->getChannelName() + " " + mode + "\r\n";
-        std::vector<int> &channelClients = channel->getClients();
-        std::vector<int>::iterator it = channelClients.begin();
-        while (it != channelClients.end())
-        {
-            send(*it, modeMsg.c_str(), modeMsg.length(), 0);
-            ++it;
-        }
+        channel->broadcastMessage(server, -1, modeMsg);
     }
     else
         throw Server::warnRunning(client.getSocketFD(), 482);
 }
 
-void modeT(const Client &client, Channel* channel, bool add)
+void modeT(Server &server, const Client &client, Channel* channel, bool add)
 {
     if(channel->isOperator(client.getSocketFD()))
     {
@@ -48,19 +42,13 @@ void modeT(const Client &client, Channel* channel, bool add)
             mode = "-t";
         std::string modeMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + 
             " MODE " + channel->getChannelName() + " " + mode + "\r\n";
-                std::vector<int> &channelClients = channel->getClients();
-        std::vector<int>::iterator it = channelClients.begin();
-        while (it != channelClients.end())
-        {
-            send(*it, modeMsg.c_str(), modeMsg.length(), 0);
-            ++it;
-        }
+        channel->broadcastMessage(server, -1, modeMsg);
     }
     else
         throw Server::warnRunning(client.getSocketFD(), 482);
 }
 
-void modeK(const Client &client, Channel* channel, bool add, std::string key)
+void modeK(Server &server, const Client &client, Channel* channel, bool add, std::string key)
 {
     if(channel->isOperator(client.getSocketFD()))
     {
@@ -79,13 +67,7 @@ void modeK(const Client &client, Channel* channel, bool add, std::string key)
         }
         std::string modeMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + 
             " MODE " + channel->getChannelName() + " " + mode + "\r\n";
-        std::vector<int> &channelClients = channel->getClients();
-        std::vector<int>::iterator it = channelClients.begin();
-        while (it != channelClients.end())
-        {
-            send(*it, modeMsg.c_str(), modeMsg.length(), 0);
-            ++it;
-        }
+        channel->broadcastMessage(server, -1, modeMsg);
     }
     else
         throw Server::warnRunning(client.getSocketFD(), 482);
@@ -112,19 +94,13 @@ void modeO(Server &server, const Client &client, Channel* channel, bool add, con
         }
         std::string modeMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + 
             " MODE " + channel->getChannelName() + " " + mode + "\r\n";
-        std::vector<int> &channelClients = channel->getClients();
-        std::vector<int>::iterator it = channelClients.begin();
-        while (it != channelClients.end())
-        {
-            send(*it, modeMsg.c_str(), modeMsg.length(), 0);
-            ++it;
-        }
+        channel->broadcastMessage(server, -1, modeMsg);
     }
     else
         throw Server::warnRunning(client.getSocketFD(), 482);
 }
 
-void modeL(Channel* channel, bool add, int userLimit, const Client &client)
+void modeL(Server &server, Channel* channel, bool add, int userLimit, const Client &client)
 {
     if(channel->isOperator(client.getSocketFD()))
     {
@@ -145,13 +121,7 @@ void modeL(Channel* channel, bool add, int userLimit, const Client &client)
         }
         std::string modeMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + 
             " MODE " + channel->getChannelName() + " " + mode + "\r\n";
-        std::vector<int> &channelClients = channel->getClients();
-        std::vector<int>::iterator it = channelClients.begin();
-        while (it != channelClients.end())
-        {
-            send(*it, modeMsg.c_str(), modeMsg.length(), 0);
-            ++it;
-        }
+        channel->broadcastMessage(server, -1, modeMsg);
     }
     else
         throw Server::warnRunning(client.getSocketFD(), 482);
@@ -187,17 +157,17 @@ void mode(Server &server, Client &client, const Commands &command)
                 add = false;
                 break;
             case 'i':
-                modeI(client, channel, add);
+                modeI(server, client, channel, add);
                 break;
             case 't':
-                modeT(client, channel, add);
+                modeT(server, client, channel, add);
                 break;
             case 'k':
             {
                 std::string key = "";
                 if (command.params.size() > 2 && add)
                     key = command.params[2];
-                modeK(client, channel, add, key);
+                modeK(server, client, channel, add, key);
                 break;
             }
             case 'o':
@@ -218,7 +188,7 @@ void mode(Server &server, Client &client, const Commands &command)
                     std::stringstream ss(command.params[2]);
                     ss >> limit;
                 }
-                modeL(channel, add, limit, client);
+                modeL(server, channel, add, limit, client);
                 break;
             }
             default:

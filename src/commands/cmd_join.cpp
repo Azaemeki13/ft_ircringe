@@ -92,17 +92,33 @@ void join(Server &server, Client &client, const Commands &command)
             servit->second.removeInvitedUser(client.getSocketFD());
         std::string joinMsg = ":" + client.getNickName() + "!~" + client.getUserName() + "@" +
                               client.getHostName() + " JOIN :" + pr_it->first + "\r\n"; //broadcast
-        servit->second.broadcastMessage(&client, joinMsg);
+        servit->second.broadcastMessage(server, client.getSocketFD(), joinMsg);
         std::string joinMsgSelf = ":" + client.getNickName() + "!~" + client.getUserName() + "@" + client.getHostName() + " JOIN " + pr_it->first + "\r\n";
-        send(client.getSocketFD(), joinMsgSelf.c_str(), joinMsgSelf.length(), 0);
-        std::string namesReply = ":server 353 " + client.getNickName() + " = " + pr_it->first + " :" + client.getNickName() + "\r\n";
-        send(client.getSocketFD(), namesReply.c_str(), namesReply.length(), 0);
+        client.addTowBuffer(joinMsgSelf);
+        server.enableWriteEvent(client.getSocketFD());
+        std::string userList;
+        std::vector<int> &members = servit->second.getClients();
+        for (size_t i = 0; i < members.size(); i++)
+        {
+            if (server.getClients().find(members[i]) == server.getClients().end())
+                continue;
+            Client &member = server.getClients()[members[i]];
+            if (!userList.empty()) userList += " ";
+            if (servit->second.isOperator(members[i]))
+                userList += "@";
+            userList += member.getNickName();
+        }
+        std::string namesReply = ":server 353 " + client.getNickName() + " = " + pr_it->first + " :" + userList + "\r\n";
+        client.addTowBuffer(namesReply);
+        server.enableWriteEvent(client.getSocketFD());
         std::string endOfNames = ":server 366 " + client.getNickName() + " " + pr_it->first + " :End of /NAMES list\r\n";
-        send(client.getSocketFD(), endOfNames.c_str(), endOfNames.length(), 0);
+        client.addTowBuffer(endOfNames);
+        server.enableWriteEvent(client.getSocketFD());
         if (!servit->second.getTopic().empty())
         {
             std::string topicMsg = ":server 332 " + client.getNickName() + " " + pr_it->first + " :" + servit->second.getTopic() + "\r\n";
-            send(client.getSocketFD(), topicMsg.c_str(), topicMsg.length(), 0);
+            client.addTowBuffer(topicMsg);
+            server.enableWriteEvent(client.getSocketFD());
         }
     }
 }

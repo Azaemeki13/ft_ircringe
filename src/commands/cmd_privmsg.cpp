@@ -53,7 +53,8 @@ void sendToUser(Server &server, Client &client, const std::string &receiver, con
         throw Server::warnRunning(client.getSocketFD(), 401);
     Client *recipient = &server.getClients()[recipientFD];
     std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + receiver + " :" + messageToSend + "\r\n";
-    send(recipient->getSocketFD(), messageReady.c_str(), messageReady.length(), 0);
+    recipient->addTowBuffer(messageReady);
+    server.enableWriteEvent(recipient->getSocketFD());
 }
 
 void sendToChannel(Server &server, Client &client, const std::string &channel, const std::string &messageToSend)
@@ -65,13 +66,14 @@ void sendToChannel(Server &server, Client &client, const std::string &channel, c
         throw Server::warnJoin(client.getSocketFD(), 442, channel);
     std::string messageReady = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " PRIVMSG " + channel_it->first + " :" + messageToSend + "\r\n"; 
     std::vector<int> &chan_clients = channel_it->second.getClients();
-    std::vector<int>::iterator browse;
-    for(browse = chan_clients.begin(); browse != chan_clients.end(); ++browse)
+    for(size_t i = 0; i < chan_clients.size(); ++i)
     {
-        if (*browse != client.getSocketFD())
-        {
-            send(*browse, messageReady.c_str(), messageReady.length(), 0);
-        }
+        int fd = chan_clients[i];
+        if (fd == client.getSocketFD())
+            continue;
+        Client &dest = server.getClients()[fd];
+        dest.addTowBuffer(messageReady);
+        server.enableWriteEvent(fd);
     }
 }
 

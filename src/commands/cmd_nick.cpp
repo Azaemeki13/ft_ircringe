@@ -76,31 +76,32 @@ void nick(Server &server, Client &client, const Commands &command)
         throw Server::warnRunning(client.getSocketFD(), 433);
     std::string oldNick = client.getNickName();
     client.setNickName(newNick);
-
-    if(client.getUserName().empty())
+    if (!client.getIsAuthorized()) 
         return;
-    std::string prefix = oldNick;
-    if(!prefix.empty())
-        prefix += "!~" + client.getUserName() + "@" + client.getHostName();
-    else
-        prefix = newNick + "!~" + client.getUserName() + "@" + client.getHostName();
-    std::string response = ":" + prefix + " NICK " + newNick + "\r\n";
+    std::string response = ":" + oldNick + "!~" + client.getUserName() + "@" + client.getHostName() + " NICK " + newNick + "\r\n";
+    std::set<int> neighbors; 
     std::map<std::string, Channel> &channels = server.getChannels();
-    std::map<std::string, Channel>::iterator it = channels.begin();
-    while(it != channels.end())
+    for (std::map<std::string, Channel>::iterator it = channels.begin(); it != channels.end(); ++it)
     {
-        std::vector<int> &channelClients = it->second.getClients();
-        std::vector<int>::iterator clientIt = channelClients.begin();
-        while(clientIt != channelClients.end())
+        if (it->second.isInChannel(client.getSocketFD()))
         {
-            if(*clientIt == client.getSocketFD())
+            std::vector<int> &members = it->second.getClients();
+            for (size_t i = 0; i < members.size(); i++)
             {
-                it->second.broadcastMessage(&client, response);
-                break;
+                if (members[i] != client.getSocketFD())
+                    neighbors.insert(members[i]);
             }
-            ++clientIt;
         }
-        ++it;
     }
-    send(client.getSocketFD(), response.c_str(), response.length(), 0);
+    for (std::set<int>::iterator n_it = neighbors.begin(); n_it != neighbors.end(); ++n_it)
+    {
+        Client *neighbor = server.getClientPoint(*n_it);
+        if (neighbor)
+        {
+            neighbor->addTowBuffer(response);
+            server.enableWriteEvent(neighbor->getSocketFD());
+        }
+    }
+    client.addTowBuffer(response);
+    server.enableWriteEvent(client.getSocketFD());
 }

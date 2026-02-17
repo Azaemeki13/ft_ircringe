@@ -41,7 +41,9 @@ void invite(Server &server, Client &client, const Commands &command)
     channel->addInvitedUser(targetFD);
     
     std::string invitingReply = ":server 341 " + client.getNickName() + " " + targetNick + " " + channelName + "\r\n";
-    send(client.getSocketFD(), invitingReply.c_str(), invitingReply.length(), 0);
+    client.addTowBuffer(invitingReply);
+    server.enableWriteEvent(client.getSocketFD());
     std::string inviteMsg = ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getHostName() + " INVITE " + targetNick + " " + channelName + "\r\n";
-    send(targetFD, inviteMsg.c_str(), inviteMsg.length(), 0);
+    client.addTowBuffer(inviteMsg);
+    server.enableWriteEvent(client.getSocketFD());
 }

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Channel.hpp"
+#include "Server.hpp"
 
 Channel::Channel() : channelName(""), topic(""), inviteOnly(0),
         topicProtected(0), key(""), userLimit(0)
@@ -160,13 +161,18 @@ bool Channel::isInChannel(int client) const
     return(0);
 }
 
-void Channel::broadcastMessage(Client* fromWho, const std::string &msg)
+void Channel::broadcastMessage(Server &server,int sender_fd, const std::string &msg)
 {
     std::vector<int>::iterator it = clients.begin();
     while(it != clients.end())
     {
-        if (*it != fromWho->getSocketFD())
-            send(*it, msg.c_str(), msg.length(), 0);
+        int fd = *it;
+        if (*it != sender_fd)
+        {
+            Client &recipient = server.getClients()[fd];
+            recipient.addTowBuffer(msg);
+            server.enableWriteEvent(fd);
+        }
         ++it;
     }
 }

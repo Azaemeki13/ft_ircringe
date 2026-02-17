@@ -14,14 +14,14 @@
 
 Client::Client() : 
     socketFD(-1), _connexionTime(time(NULL)), isAuthorized(false),
-    authState(0), nickName(""),  userName(""), realName(""), hostName("")
+    authState(0), nickName(""),  userName(""), realName(""), hostName(""), writeBuffer("")
 {
     joinedChannels.clear();
 }
 
 Client::Client(int fd, const std::string &host) : 
     socketFD(fd), _connexionTime(time(NULL)), isAuthorized(false),
-    authState(0), nickName(""),  userName(""), realName(""), hostName(host)
+    authState(0), nickName(""),  userName(""), realName(""), hostName(host), writeBuffer("")
 {
     joinedChannels.clear(); //starts empty
 }
@@ -66,6 +66,11 @@ std::string& Client::getBuffer()
     return buffer;
 }
 
+std::string& Client::getWriteBuffer()
+{
+    return writeBuffer;
+}
+
 void Client::setNickName(const std::string &nick)
 {
     nickName = nick;
@@ -84,6 +89,11 @@ void Client::setRealName(const std::string &real)
 void Client::setHostName(const std::string &host)
 {
     hostName = host;
+}
+
+void Client::addTowBuffer(const std::string &msg)
+{
+    writeBuffer += msg;
 }
 
 const std::string& Client::getNickName() const

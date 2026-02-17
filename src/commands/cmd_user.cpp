@@ -53,7 +53,7 @@ bool isValidReal(const std::string &real)
     return(true);
 }
 
-void user(Client &client, const Commands &command)
+void user(Server &server, Client &client, const Commands &command)
 {
     if(!client.getUserName().empty())
         throw Server::warnRunning(client.getSocketFD(), 462);
@@ -76,11 +76,15 @@ void user(Client &client, const Commands &command)
     if(nickname.empty())
         nickname = "*";
     std::string welcome = ":server 001 " + nickname + " :Welcome to the IRC Network " + nickname + "!~" + username + "@localhost\r\n";
-    send(client.getSocketFD(), welcome.c_str(), welcome.length(), 0);
+    client.addTowBuffer(welcome);
+    server.enableWriteEvent(client.getSocketFD());
     std::string yourhost = ":server 002 " + nickname + " :Your host is server, running version 1.0\r\n";
-    send(client.getSocketFD(), yourhost.c_str(), yourhost.length(), 0);
+    client.addTowBuffer(yourhost);
+    server.enableWriteEvent(client.getSocketFD());
     std::string created = ":server 003 " + nickname + " :This server was created today\r\n";
-    send(client.getSocketFD(), created.c_str(), created.length(), 0);
+    client.addTowBuffer(created);
+    server.enableWriteEvent(client.getSocketFD());
     std::string myinfo = ":server 004 " + nickname + " server 1.0 o o\r\n";
-    send(client.getSocketFD(), myinfo.c_str(), myinfo.length(), 0);
+    client.addTowBuffer(myinfo);
+    server.enableWriteEvent(client.getSocketFD());
 }
