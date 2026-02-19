@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/06 14:00:51 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/19 14:50:48 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -466,6 +466,8 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
             mode(*this, client, cmd);
         else if(cmd.command == "INVITE")
             invite(*this, client, cmd);
+        else if(cmd.command == "LIST")
+            list(*this, client, cmd);
         else if (cmd.command == "QUIT")
         {
             std::cout << "Client requested QUIT" << std::endl;

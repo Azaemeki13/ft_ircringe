@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 12:54:30 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/06 13:43:59 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/02/19 14:50:22 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ void topic(Server &server, Client &client, const Commands &command);
 void kick(Server &server, Client &client, const Commands &command);
 void mode(Server &server, Client &client, const Commands &command);
 void invite(Server &server, Client &client, const Commands &command);
+void list(Server &server, Client &client, const Commands &command);
 
 // utils
 std::vector<std::string> split(const std::string &str, char delimiter);
