@@ -3,25 +3,31 @@ import time
 
 # Configuration
 HOST = "localhost"
-PORT = 8080
+PORT = 6969
 PASSWORD = "test"
 BOT_NICKNAME = "irc_bot"
 
 def handle_message(message):
     """Process incoming messages and return appropriate responses"""
-    if ">help" in message:
-        return ("Figure it out yourself! 😎 Just kidding, here are some commands you can try: "
-                ">labubu, >skibidi")
-    elif ">labubu" in message:
-        return ("OMG LABUBU IS SO CUTE!!! 🎀✨ The pink monster with tiny teeth is everywhere! "
-                "Labubu dance! Labubu plushie! Labubu keychain! Labubu takeover the world! "
-                "Monster but make it kawaii~ 💖🦷👾")
-    elif ">skibidi" in message:
-        return ("SKIBIDI DOP DOP DOP YES YES! 🚽💀 Skibidi toilet rizz! Ohio final boss! "
-                "Only in Ohio bruh! Camera head vs toilet head! Skibidi bop bop bop! "
-                "The most unhinged brainrot content! We live in a simulation! 📹🚽✨")
-    elif ">67" in message:
-        return ("67 is the best number! It's prime, it's lucky ✨✨ ")
+    # Strip whitespace and split into words for exact matching
+    words = message.strip().split()
+    
+    # Check if any word is exactly one of our commands
+    for word in words:
+        if word == ">help":
+            return ("Figure it out yourself! 😎 Just kidding, here are some commands you can try: "
+                    ">labubu, >skibidi")
+        elif word == ">labubu":
+            return ("OMG LABUBU IS SO CUTE!!! 🎀✨ The pink monster with tiny teeth is everywhere! "
+                    "Labubu dance! Labubu plushie! Labubu keychain! Labubu takeover the world! "
+                    "Monster but make it kawaii~ 💖🦷👾")
+        elif word == ">skibidi":
+            return ("SKIBIDI DOP DOP DOP YES YES! 🚽💀 Skibidi toilet rizz! Ohio final boss! "
+                    "Only in Ohio bruh! Camera head vs toilet head! Skibidi bop bop bop! "
+                    "The most unhinged brainrot content! We live in a simulation! 📹🚽✨")
+        elif word == ">67":
+            return ("67 is the best number! It's prime, it's lucky ✨✨ ")
+    
     return None
 
 def run_bot():
@@ -29,6 +35,7 @@ def run_bot():
     irc = None
     try:
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        irc.settimeout(5.0)  # Set timeout to allow periodic checks
         irc.connect((HOST, PORT))
         print(f"[*] Connected to {HOST}:{PORT}")
 
@@ -90,10 +97,27 @@ def run_bot():
         
         print(f"[*] Bot is now listening for messages...")
 
+        # Track channels the bot has joined
+        joined_channels = set([channel for channel, _ in channels_to_join])
+        
+        # Timer for periodic channel list checks
+        last_list_check = time.time()
+        list_check_interval = 5  # Check for new channels every 30 seconds
 
         buffer = ""
+        pending_list_response = False
+        
         while True:
             try:
+                # Periodically check for new channels
+                current_time = time.time()
+                time_since_last_check = current_time - last_list_check
+                if time_since_last_check >= list_check_interval and not pending_list_response:
+                    irc.send(b"LIST\r\n")
+                    pending_list_response = True
+                    last_list_check = current_time
+                    print(f"[*] Checking for new channels... (last check was {time_since_last_check:.1f}s ago)")
+                
                 data = irc.recv(2048).decode('utf-8', errors='ignore')
                 if not data:
                     print("[!] Connection closed by server")
@@ -114,6 +138,50 @@ def run_bot():
                         irc.send(pong_response.encode())
                         print(f"[>] {pong_response.strip()}")
                         continue
+
+                    # Handle LIST responses to detect new channels
+                    if " 322 " in line:
+                        parts = line.split()
+                        if len(parts) >= 4:
+                            channel_name = parts[3]
+                            user_count = int(parts[4]) if len(parts) > 4 and parts[4].isdigit() else 0
+                            
+                            print(f"[DEBUG] LIST found: {channel_name} with {user_count} users, already joined: {channel_name in joined_channels}")
+                            
+                            # Join new populated channels we haven't joined yet
+                            if user_count > 0 and channel_name.startswith('#') and channel_name not in joined_channels:
+                                irc.send(f"JOIN {channel_name}\r\n".encode())
+                                joined_channels.add(channel_name)
+                                print(f"[*] Found new channel {channel_name} ({user_count} users), joining...")
+                    
+                    if " 323 " in line:
+                        # End of LIST response
+                        pending_list_response = False
+                        print("[DEBUG] LIST response complete")
+
+                    # Auto-join new channels when someone else creates/joins them
+                    if " JOIN " in line:
+                        print(f"[DEBUG] Detected JOIN message: {line}")
+                        # Parse the JOIN message: :nick!user@host JOIN :#channel
+                        if line.startswith(':'):
+                            parts = line.split()
+                            print(f"[DEBUG] Parsed parts: {parts}")
+                            if len(parts) >= 3:
+                                nick_part = parts[0][1:]  # Remove leading ':'
+                                nick = nick_part.split('!')[0]
+                                channel = parts[2].lstrip(':')
+                                print(f"[DEBUG] Nick: {nick}, Channel: {channel}, Bot: {BOT_NICKNAME}")
+                                print(f"[DEBUG] Joined channels: {joined_channels}")
+                                
+                                # If someone else joined a channel and bot hasn't joined it yet
+                                if nick != BOT_NICKNAME and channel.startswith('#') and channel not in joined_channels:
+                                    irc.send(f"JOIN {channel}\r\n".encode())
+                                    joined_channels.add(channel)
+                                    print(f"[*] Auto-joining new channel: {channel}")
+                                elif nick == BOT_NICKNAME:
+                                    # Track when bot successfully joins
+                                    joined_channels.add(channel)
+                                    print(f"[DEBUG] Bot joined {channel}, added to tracking")
 
                     if "PRIVMSG" in line:
                         sender = None

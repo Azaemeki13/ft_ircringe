@@ -58,4 +58,9 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+bonus:
+	@echo "$(GREEN)Starting bot.py in 2 seconds...$(RESET)"
+	@sleep 2
+	python3 bot.py
+
+.PHONY: all clean fclean re bonus
