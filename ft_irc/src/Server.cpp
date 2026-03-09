@@ -98,24 +98,26 @@ void Server::run()
             handleNewConnection();
             continue;
         }
-        if (current_events & EPOLLIN)
-            handleClientMessage(current_fd);
-        if (current_events & EPOLLOUT)
-            handleClientWrite(current_fd);
         if (current_events & (EPOLLERR | EPOLLHUP))
         {
-            removeKickedClient(current_fd);
-            epoll_ctl(epfd, EPOLL_CTL_DEL, current_fd, NULL);
-            close(current_fd);
-            clients.erase(current_fd);
+            cleanupClient(current_fd);
+            continue;
         }
+        if (current_events & EPOLLIN)
+        {
+            handleClientMessage(current_fd);
+            if (clients.find(current_fd) == clients.end())
+                continue;
+        }
+        if (current_events & EPOLLOUT)
+            handleClientWrite(current_fd);
         std::cout << "FD" << current_fd << "HAS BEEN FULLY PURGED MOUAHAHA" << std::endl;
     }
 }
 
 void Server::handleNewConnection()
 {
-    struct sockaddr_in6 client_addr;
+    struct sockaddr_in client_addr;
     socklen_t addr_len = sizeof(client_addr);
     int new_fd;
 
@@ -125,8 +127,8 @@ void Server::handleNewConnection()
         std::cerr << "Error accepting connection" << std::endl; // maybe unique exception here
         return;
     }
-    char client_ip[INET6_ADDRSTRLEN];
-    inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip, INET6_ADDRSTRLEN);
+    char client_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
     // std::cout << "Accepted connection from: " << client_ip << std::endl; DEBUG
     if (fcntl(new_fd, F_SETFL, O_NONBLOCK) == -1)
     {
@@ -155,9 +157,7 @@ void Server::handleClientMessage(int fd)
     if (bytes_read <= 0)
     {
         std::cout << "Client " << fd << " disconnected." << std::endl;
-        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-        close(fd);
-        clients.erase(fd);
+        cleanupClient(fd);
         return;
     }
     Client &currentUser = clients[fd];
@@ -166,14 +166,8 @@ void Server::handleClientMessage(int fd)
     {
         if (fd == -1)
             throw (Server::warnRunning(fd, 401));
-        std::string messageReady = "GET KICKED FOR FLOODING MEANIE :)\r\n";
-        currentUser.addTowBuffer(messageReady);
-        this->enableWriteEvent(fd);
-        removeKickedClient(fd);
-        shutdown(fd, SHUT_WR);
-        epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-        close(fd);
-        clients.erase(fd);
+        std::cout << "Client " << fd << " kicked for flooding." << std::endl;
+        cleanupClient(fd);
         return;
     }
     size_t pos = 0;
@@ -303,6 +297,48 @@ void Server::removeKickedClient(int fd)
         it->second.removeOperator(fd);
         ++it;
     }
+}
+
+void Server::cleanupClient(int fd)
+{
+std::cout << "FD " << fd << " HAS BEEN FULLY PURGED MOUAHAHA" << std::endl;
+    std::map<int, Client>::iterator it = clients.find(fd);
+    if (it != clients.end())
+    {
+        Client &deadClient = it->second;
+        if (!deadClient.getNickName().empty() && deadClient.getIsAuthorized())
+        {
+            std::string quitMsg = ":" + deadClient.getNickName() + "!~" + deadClient.getUserName() + "@" + deadClient.getHostName() + " QUIT :Client disconnected\r\n";
+            std::set<int> neighbors;
+            std::map<std::string, Channel>::iterator chan_it = channels.begin();
+            while (chan_it != channels.end())
+            {
+                if (chan_it->second.isInChannel(fd))
+                {
+                    std::vector<int> &members = chan_it->second.getClients();
+                    for (size_t i = 0; i < members.size(); ++i)
+                    {
+                        if (members[i] != fd)
+                            neighbors.insert(members[i]);
+                    }
+                }
+                ++chan_it;
+            }
+            for (std::set<int>::iterator n_it = neighbors.begin(); n_it != neighbors.end(); ++n_it)
+            {
+                Client *neighbor = getClientPoint(*n_it);
+                if (neighbor)
+                {
+                    neighbor->addTowBuffer(quitMsg);
+                    enableWriteEvent(*n_it);
+                }
+            }
+        }
+    }
+    removeKickedClient(fd);
+    epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+    close(fd);
+    clients.erase(fd);
 }
 
 void Server::sendError(Client &client, const std::string &code, const std::string &message)
@@ -471,6 +507,7 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
         else if (cmd.command == "QUIT")
         {
             std::cout << "Client requested QUIT" << std::endl;
+            cleanupClient(client.getSocketFD());
             return;
         }
         else if (cmd.command == "KICK")
@@ -483,6 +520,7 @@ void Server::processCommand(Client &client, const std::string &message) //maybe 
     }
     catch (Server::warnRunning &e)
     {
+        std::cout << "Caught runningError here :)" << std::endl;
         handleError(e, client, cmd);
         return;
     }

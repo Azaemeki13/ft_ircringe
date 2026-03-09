@@ -8,9 +8,9 @@ import random
 # Variables 
 
 HOST = "localhost"
-PORT = 8080
+PORT = 6969
 PASSWORD = "test"
-CHANNEL_NAME = "#ok"
+CHANNEL_NAME = "#test"
 CHANNEL_PW = ""
 BOT_COUNT = 100
 BASE_NAME = "Rocco"

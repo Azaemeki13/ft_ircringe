@@ -36,6 +36,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <set>
 #include <stdexcept>
 #include <exception>
 #include <sstream>
@@ -76,6 +77,7 @@ class Server
 
     // error handling && fucking ddos protection (flood)
         void removeKickedClient(int fd);
+        void cleanupClient(int fd);
         void sendError(Client &client, const std::string &code, const std::string &message);
         std::string getErrorMessage(int code, const Commands &cmd) const;
 
