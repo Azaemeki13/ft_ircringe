@@ -1,6 +1,4 @@
-# ft_irc
-
-*This project has been created as part of the 42 curriculum by chsauvag, adi-marc, cauffret.*
+_This project has been created as part of the 42 curriculum by chsauvag, adi-marc, cauffret._
 
 ## Description
 
@@ -74,7 +72,7 @@ USER username 0 * :Real Name
 
 Run the included Python bot:
 ```bash
-make bonus    # Launch the bot automatically
+make bonus    # Launch the bot
 # OR
 python3 bot.py
 ```
@@ -111,7 +109,6 @@ ft_irc/
 │   ├── Client.hpp     # Client class definition
 │   ├── Commands.hpp   # Command declarations
 │   ├── Parser.hpp     # Message parser
-│   ├── Replies.hpp    # IRC numeric replies
 │   ├── Server.hpp     # Server class definition
 │   └── Utils.hpp      # Utility functions
 ├── src/               # Source files

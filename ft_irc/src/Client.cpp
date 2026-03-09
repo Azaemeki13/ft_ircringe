@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:42 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 13:43:51 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/03/09 16:40:09 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ Client::Client(int fd, const std::string &host) :
 
 Client::~Client()
 {
-    std::cout << "Destructor called on client." << std::endl;
 }
 
 int Client::getSocketFD() const

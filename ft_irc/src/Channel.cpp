@@ -6,7 +6,7 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:52:44 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/02/06 14:05:16 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/03/09 16:40:05 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ Channel::Channel(const std::string& channelName, const std::string &password) : 
 
 Channel::~Channel()
 {
-    std::cout << "Destructor called on channel." << std::endl;
 }
 
 std::vector<int> &Channel::getClients()

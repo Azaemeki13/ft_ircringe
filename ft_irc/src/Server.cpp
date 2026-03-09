@@ -6,34 +6,29 @@
 /*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 13:18:13 by cauffret          #+#    #+#             */
-/*   Updated: 2026/02/19 14:50:48 by chsauvag         ###   ########.fr       */
+/*   Updated: 2026/03/09 16:41:06 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include "Utils.hpp"
 
-// OCF 
-
-Server::Server() : port(66)
+Server::Server() : port(66), password("")
 {
     channels.insert(std::make_pair("general", Channel("general")));
     initServ(66);
-    std::cout << "Default constructor called for Server." << std::endl;
 }
 
-Server::Server(int port)
+Server::Server(int port) : port(port), password("")
 {
     channels.insert(std::make_pair("general", Channel("general")));
     initServ(port);
-    std::cout << "Parameterised constructor called for Server." << std::endl;
 }
 
-Server::Server(int port, std::string password) : password(password)
+Server::Server(int port, std::string password) : port(port), password(password)
 {
     channels.insert(std::make_pair("general", Channel("general")));
     initServ(port);
-    std::cout << "Parameterised constructor called for Server." << std::endl;
 }
 
 Server::~Server()
@@ -42,7 +37,6 @@ Server::~Server()
         close(listener);
     if (epfd != -1)
         close (epfd);
-    std::cout << "Called destructor on server." << std::endl;
 }
 
 void Server::initServ(int port)
@@ -111,13 +105,12 @@ void Server::run()
         }
         if (current_events & EPOLLOUT)
             handleClientWrite(current_fd);
-        std::cout << "FD" << current_fd << "HAS BEEN FULLY PURGED MOUAHAHA" << std::endl;
     }
 }
 
 void Server::handleNewConnection()
 {
-    struct sockaddr_in client_addr;
+    struct sockaddr_in6 client_addr;
     socklen_t addr_len = sizeof(client_addr);
     int new_fd;
 
@@ -127,9 +120,8 @@ void Server::handleNewConnection()
         std::cerr << "Error accepting connection" << std::endl; // maybe unique exception here
         return;
     }
-    char client_ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-    // std::cout << "Accepted connection from: " << client_ip << std::endl; DEBUG
+    char client_ip[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip, INET6_ADDRSTRLEN);
     if (fcntl(new_fd, F_SETFL, O_NONBLOCK) == -1)
     {
         std::cerr << "fcntl" << std::endl;
@@ -180,7 +172,6 @@ void Server::handleClientMessage(int fd)
             substr = currentUser.getBuffer().substr(0, pos);
         if (!substr.empty())
         {
-            std::cout << "Debug: " << fd << " sent " << substr << std::endl;
             processCommand(currentUser, substr);
         }
         currentUser.getBuffer().erase(0, pos + 1);
@@ -206,13 +197,11 @@ void Server::handleClientWrite(int fd)
         if (buffer.empty())
             disableWriteEvent(fd);
     }
-    else if (bytes_sent == -1)
+    else if (bytes_sent == 0)
     {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return;
+        std::cerr << "Connection closed by peer." << std::endl;
+        cleanupClient(fd);
     }
-    else
-        std::cerr << "Send failed." << std::endl;
 }
 
 void Server::disableWriteEvent(int fd)
@@ -301,7 +290,6 @@ void Server::removeKickedClient(int fd)
 
 void Server::cleanupClient(int fd)
 {
-std::cout << "FD " << fd << " HAS BEEN FULLY PURGED MOUAHAHA" << std::endl;
     std::map<int, Client>::iterator it = clients.find(fd);
     if (it != clients.end())
     {
@@ -453,7 +441,7 @@ std::string Server::getErrorMessage(int code, const Commands &cmd) const
         case 482:
             return(cmd.params[0] + " :You're not channel operator");
         default:
-            return(":Unknown error"); //debug
+            return(":Unknown error");
     }
 }
 

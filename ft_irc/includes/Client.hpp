@@ -3,20 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cauffret <cauffret@student.42.fr>          +#+  +:+       +#+        */
+/*   By: chsauvag <chsauvag@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:50:37 by chsauvag          #+#    #+#             */
-/*   Updated: 2026/01/28 13:56:14 by cauffret         ###   ########.fr       */
+/*   Updated: 2026/03/09 16:34:05 by chsauvag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
-
-#define NEED_PASS 0
-#define NEED_NICK 0
-#define NEED_USER 0
-#define REGISTERED 0
 
 #include <sys/types.h>
 #include <sys/socket.h>
